@@ -26,6 +26,8 @@
 #include "vmstate.h"
 #include "stream.h"
 
+#ifdef HAVE_VMSTATE
+
 static int slirp_tcp_post_load(void *opaque, int version)
 {
     tcp_template((struct tcpcb *)opaque);
@@ -377,3 +379,5 @@ int slirp_state_version(void)
 {
     return 4;
 }
+
+#endif /* HAVE_VMSTATE */
