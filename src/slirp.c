@@ -69,7 +69,7 @@ static const struct in6_addr SITE_LOCAL_DNS_BROADCAST_ADDRS[] = {
 
 #endif
 
-int slirp_debug;
+unsigned int slirp_debug;
 
 /* Define to 1 if you want KEEPALIVE timers */
 bool slirp_do_keepalive;
@@ -314,7 +314,7 @@ static int get_dns_addr_libresolv(int af, void *pdns_addr, void *cached_addr,
         if (found > 3) {
             DEBUG_MISC("  (more)");
             break;
-        } else if (slirp_debug & DBG_MISC) {
+        } else if (slirp_debug & SLIRP_DBG_MISC) {
             char s[INET6_ADDRSTRLEN];
             const char *res = inet_ntop(af, addr, s, sizeof(s));
             if (!res) {
@@ -423,7 +423,7 @@ static bool try_and_setdns_server(int af, unsigned found, unsigned if_index,
 
     if (found > 2) {
 	DEBUG_MISC("  (more)");
-    } else if (slirp_debug & DBG_MISC) {
+    } else if (slirp_debug & SLIRP_DBG_MISC) {
 	char s[INET6_ADDRSTRLEN];
 	const char *res = inet_ntop(af, &tmp_addr, s, sizeof(s));
 	if (!res) {
@@ -551,11 +551,11 @@ static void slirp_init_once(void)
     debug = g_getenv("SLIRP_DEBUG");
     if (debug) {
         const GDebugKey keys[] = {
-            { "call", DBG_CALL },
-            { "misc", DBG_MISC },
-            { "error", DBG_ERROR },
-            { "tftp", DBG_TFTP },
-            { "verbose_call", DBG_VERBOSE_CALL },
+            { "call", SLIRP_DBG_CALL },
+            { "misc", SLIRP_DBG_MISC },
+            { "error", SLIRP_DBG_ERROR },
+            { "tftp", SLIRP_DBG_TFTP },
+            { "verbose_call", SLIRP_DBG_VERBOSE_CALL },
         };
         slirp_debug = g_parse_debug_string(debug, keys, G_N_ELEMENTS(keys));
     }
