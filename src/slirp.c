@@ -957,40 +957,42 @@ void slirp_register_poll_socket(struct socket *so)
 {
     Slirp *slirp = so->slirp;
     int fd;
-    if (slirp->cfg_version >= 6 && slirp->cb->register_poll_socket)
-        return slirp->cb->register_poll_socket(so->s, slirp->opaque);
-
-    fd = (int) so->s;
-    if ((slirp_os_socket) fd != so->s)
-        g_warning_once("Truncating socket to int failed!");
+    if (slirp->cfg_version >= 6 && slirp->cb->register_poll_socket) {
+        slirp->cb->register_poll_socket(so->s, slirp->opaque);
+    } else {
+        fd = (int) so->s;
+        if ((slirp_os_socket) fd != so->s)
+            g_warning_once("Truncating socket to int failed!");
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-    return slirp->cb->register_poll_fd(fd, slirp->opaque);
+        slirp->cb->register_poll_fd(fd, slirp->opaque);
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
+    }
 }
 
 void slirp_unregister_poll_socket(struct socket *so)
 {
     Slirp *slirp = so->slirp;
     int fd;
-    if (slirp->cfg_version >= 6 && slirp->cb->unregister_poll_socket)
-        return slirp->cb->unregister_poll_socket(so->s, slirp->opaque);
-
-    fd = (int) so->s;
-    if ((slirp_os_socket) fd != so->s)
-        g_warning_once("Truncating socket to int failed!");
+    if (slirp->cfg_version >= 6 && slirp->cb->unregister_poll_socket) {
+        slirp->cb->unregister_poll_socket(so->s, slirp->opaque);
+    } else {
+        fd = (int) so->s;
+        if ((slirp_os_socket) fd != so->s)
+            g_warning_once("Truncating socket to int failed!");
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-    return slirp->cb->unregister_poll_fd(fd, slirp->opaque);
+        slirp->cb->unregister_poll_fd(fd, slirp->opaque);
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
+    }
 }
 
 void slirp_pollfds_poll(Slirp *slirp, int select_error,
