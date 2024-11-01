@@ -35,6 +35,7 @@
 #include <errno.h>
 
 #include "util.h"
+#include "debug.h"
 
 #if defined(_WIN32)
 int slirp_inet_aton(const char *cp, struct in_addr *ia)
@@ -448,4 +449,17 @@ const char *slirp_ether_ntoa(const uint8_t *addr, char *out_str,
                addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
 
     return out_str;
+}
+
+/* Programatically set and reset debugging flags in slirp_debug vice
+ * setting them via the SLIRP_DEBUG environment variable. */
+
+void slirp_set_debug(unsigned int flags)
+{
+  slirp_debug |= flags;
+}
+
+void slirp_reset_debug(unsigned int flags)
+{
+  slirp_debug &= ~flags;
 }

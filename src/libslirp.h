@@ -76,6 +76,15 @@ enum {
     SLIRP_POLL_HUP = 1 << 4,
 };
 
+/* Debugging flags. */
+enum {
+    SLIRP_DBG_CALL         = 1 << 0,
+    SLIRP_DBG_MISC         = 1 << 1,
+    SLIRP_DBG_ERROR        = 1 << 2,
+    SLIRP_DBG_TFTP         = 1 << 3,
+    SLIRP_DBG_VERBOSE_CALL = 1 << 4,
+};
+
 /* Callback for application to get data from the guest */
 typedef slirp_ssize_t (*SlirpReadCb)(void *buf, size_t len, void *opaque);
 /* Callback for application to send data to the guest */
@@ -382,6 +391,24 @@ int slirp_state_load(Slirp *s, int version_id, SlirpReadCb read_cb,
 /* Return the version of the slirp implementation */
 SLIRP_EXPORT
 const char *slirp_version_string(void);
+
+/* Debugging support: There are two methods for enabling debugging
+ * in libslirp: the SLIRP_DEBUG environment variable and the
+ * slirp_(set|reset)_debug() functions.
+ *
+ * SLIRP_DEBUG is a list of debug options separated by colons, spaces
+ * or commas. Valid debug options are 'call', 'misc', 'error', 'tftp'
+ * and 'verbose_call'.
+ */
+
+/* Set debugging flags independently of the SLIRP_DEBUG environment
+ * variable. */
+SLIRP_EXPORT 
+void slirp_set_debug(unsigned int flags);
+
+/* Reset debugging flags. */
+SLIRP_EXPORT
+void slirp_reset_debug(unsigned int flags);
 
 #if defined(_WIN32)
 /* Windows utility functions: */
