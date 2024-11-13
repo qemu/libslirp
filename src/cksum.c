@@ -57,10 +57,14 @@ uint16_t cksum(struct mbuf *m, size_t len)
     mlen = m->m_len;
     data = mtod(m, uint8_t *);
     if (mlen == 0)
-        return ((uint16_t) sum);
+        return ((uint16_t) ~0);
     if (mlen > len)
         mlen = len;
-    len -= mlen;
+    if (len > mlen) {
+        DEBUG_ERROR("cksum: mbuf data underrun (out of data, len > mlen)");
+        DEBUG_ERROR(" len  = %" SLIRP_PRIsize_t, len);
+        DEBUG_ERROR(" mlen = %" SLIRP_PRIsize_t, mlen);
+    }
 
     partial = 0;
     if ((uintptr_t)data & 1) {
@@ -183,11 +187,15 @@ trailing_bytes:
     mlen = m->m_len;
     data = mtod(m, uint8_t *);
     if (mlen == 0)
-        return sum;
+        return ((uint16_t) ~0);
 
     if (mlen > len)
         mlen = len;
-    len -= mlen;
+    if (len > mlen) {
+        DEBUG_ERROR("cksum: mbuf data underrun (out of data, len > mlen)");
+        DEBUG_ERROR(" len  = %" SLIRP_PRIsize_t, len);
+        DEBUG_ERROR(" mlen = %" SLIRP_PRIsize_t, mlen);
+    }
 
     partial = 0;
     if ((uintptr_t) data & 1) {
@@ -278,7 +286,6 @@ trailing_bytes:
      * in the next iteration without carry.
      */
     sum = (sum >> 16) + (sum & 0xffff);
-    DEBUG_MISC(" ... sum = %u\n", sum);
     return ((uint16_t) ~sum);
 #endif
 }
