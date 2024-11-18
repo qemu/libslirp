@@ -214,7 +214,7 @@ int soread(struct socket *so)
             }
 
             DEBUG_MISC(" --- soread() disconnected, nn = %d, errno = %d-%s", nn,
-                       errno, strerror(errno));
+                       errno, g_strerror(errno));
             sofcantrcvmore(so);
 
             if (err == ECONNABORTED || err == ECONNRESET || err == ECONNREFUSED ||
@@ -577,8 +577,8 @@ void sorecvfrom(struct socket *so)
             else if (errno == ENETUNREACH)
                 code = ICMP_UNREACH_NET;
 
-            DEBUG_MISC(" udp icmp rx errno = %d-%s", errno, strerror(errno));
-            icmp_send_error(so->so_m, ICMP_UNREACH, code, 0, strerror(errno));
+            DEBUG_MISC(" udp icmp rx errno = %d-%s", errno, g_strerror(errno));
+            icmp_send_error(so->so_m, ICMP_UNREACH, code, 0, g_strerror(errno));
         } else {
             icmp_reflect(so->so_m);
             so->so_m = NULL; /* Don't m_free() it again! */
@@ -599,7 +599,7 @@ void sorecvfrom(struct socket *so)
             else if (errno == ENETUNREACH)
                 code = ICMP6_UNREACH_NO_ROUTE;
 
-            DEBUG_MISC(" udp icmp6 rx errno = %d-%s", errno, strerror(errno));
+            DEBUG_MISC(" udp icmp6 rx errno = %d-%s", errno, g_strerror(errno));
             icmp6_send_error(so->so_m, ICMP_UNREACH, code);
         } else {
             icmp6_reflect(so->so_m);
@@ -617,7 +617,7 @@ void sorecvfrom(struct socket *so)
 #endif
 
         if (ioctlsocket(so->s, FIONREAD, &n) != 0) {
-            DEBUG_MISC(" ioctlsocket errno = %d-%s\n", errno, strerror(errno));
+            DEBUG_MISC(" ioctlsocket errno = %d-%s\n", errno, g_strerror(errno));
             return;
         }
 
@@ -654,7 +654,7 @@ void sorecvfrom(struct socket *so)
         m->m_len = recvfrom(so->s, m->m_data, len, 0, (struct sockaddr *)&addr,
                             &addrlen);
         DEBUG_MISC(" did recvfrom %d, errno = %d-%s", m->m_len, errno,
-                   strerror(errno));
+                   g_strerror(errno));
         if (m->m_len < 0) {    	
             if (errno == ENOTCONN) {
                 /*
@@ -677,7 +677,7 @@ void sorecvfrom(struct socket *so)
 
                     DEBUG_MISC(" rx error, tx icmp ICMP_UNREACH:%i", code);
                     icmp_send_error(so->so_m, ICMP_UNREACH, code, 0,
-                                    strerror(errno));
+                                    g_strerror(errno));
                     break;
                 case AF_INET6:
                     code = ICMP6_UNREACH_PORT;

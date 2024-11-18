@@ -123,7 +123,7 @@ static int slirp_socketpair_with_oob(slirp_os_socket sv[2])
     return 0;
 
 err:
-    g_critical("slirp_socketpair(): %s", strerror(errno));
+    g_critical("slirp_socketpair(): %s", g_strerror(errno));
     if (have_valid_socket(s)) {
         closesocket(s);
     }
@@ -274,12 +274,12 @@ int open_unix(struct socket *so, const char *unixpath)
 
     s = slirp_socket(PF_UNIX, SOCK_STREAM, 0);
     if (not_valid_socket(s)) {
-        g_critical("open_unix(): %s", strerror(errno));
+        g_critical("open_unix(): %s", g_strerror(errno));
         return 0;
     }
 
     if (connect(s, (struct sockaddr *)&sa, sizeof(sa)) < 0) {
-        g_critical("open_unix(): %s", strerror(errno));
+        g_critical("open_unix(): %s", g_strerror(errno));
         closesocket(s);
         return 0;
     }

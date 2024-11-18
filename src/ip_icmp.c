@@ -149,8 +149,8 @@ static int icmp_send(struct socket *so, struct mbuf *m, int hlen)
     if (sendto(so->s, m->m_data + hlen, m->m_len - hlen, 0,
                (struct sockaddr *)&addr, sizeof(addr)) == -1) {
         DEBUG_MISC("icmp_input icmp sendto tx errno = %d-%s", errno,
-                   strerror(errno));
-        icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0, strerror(errno));
+                   g_strerror(errno));
+        icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0, g_strerror(errno));
         icmp_detach(so);
     }
 
@@ -224,7 +224,7 @@ void icmp_input(struct mbuf *m, int hlen)
 
             if (not_valid_socket(udp_attach(so, AF_INET))) {
                 DEBUG_MISC("icmp_input udp_attach errno = %d-%s", errno,
-                           strerror(errno));
+                           g_strerror(errno));
                 sofree(so);
                 m_free(m);
                 goto end_error;
@@ -243,7 +243,7 @@ void icmp_input(struct mbuf *m, int hlen)
             addr = so->fhost.ss;
             if (sotranslate_out(so, &addr) < 0) {
                 icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0,
-                                strerror(errno));
+                                g_strerror(errno));
                 udp_detach(so);
                 return;
             }
@@ -264,9 +264,9 @@ void icmp_input(struct mbuf *m, int hlen)
             if (sendto(so->s, icmp_ping_msg, strlen(icmp_ping_msg), 0,
                        (struct sockaddr *)&addr, sockaddr_size(&addr)) == -1) {
                 DEBUG_MISC("icmp_input udp sendto tx errno = %d-%s", errno,
-                           strerror(errno));
+                           g_strerror(errno));
                 icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0,
-                                strerror(errno));
+                                g_strerror(errno));
                 udp_detach(so);
             }
         } /* if ip->ip_dst.s_addr == alias_addr.s_addr */
@@ -537,8 +537,8 @@ void icmp_receive(struct socket *so)
         } else {
             error_code = ICMP_UNREACH_HOST;
         }
-        DEBUG_MISC(" udp icmp rx errno = %d-%s", errno, strerror(errno));
-        icmp_send_error(so->so_m, ICMP_UNREACH, error_code, 0, strerror(errno));
+        DEBUG_MISC(" udp icmp rx errno = %d-%s", errno, g_strerror(errno));
+        icmp_send_error(so->so_m, ICMP_UNREACH, error_code, 0, g_strerror(errno));
     } else {
         icmp_reflect(so->so_m);
         so->so_m = NULL; /* Don't m_free() it again! */
