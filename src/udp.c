@@ -179,7 +179,7 @@ void udp_input(register struct mbuf *m, int iphlen)
          */
         so = socreate(slirp, IPPROTO_UDP);
         if (not_valid_socket(udp_attach(so, AF_INET))) {
-            DEBUG_MISC(" udp_attach errno = %d-%s", errno, strerror(errno));
+            DEBUG_MISC(" udp_attach errno = %d-%s", errno, g_strerror(errno));
             sofree(so);
             goto bad;
         }
@@ -229,8 +229,8 @@ void udp_input(register struct mbuf *m, int iphlen)
         m->m_len += iphlen;
         m->m_data -= iphlen;
         *ip = save_ip;
-        DEBUG_MISC("udp tx errno = %d-%s", errno, strerror(errno));
-        icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0, strerror(errno));
+        DEBUG_MISC("udp tx errno = %d-%s", errno, g_strerror(errno));
+        icmp_send_error(m, ICMP_UNREACH, ICMP_UNREACH_NET, 0, g_strerror(errno));
         goto bad;
     }
 

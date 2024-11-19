@@ -100,7 +100,7 @@ static int icmp6_send(struct socket *so, struct mbuf *m, int hlen)
     if (sendto(so->s, m->m_data + hlen, m->m_len - hlen, 0,
                (struct sockaddr *)&addr, sizeof(addr)) == -1) {
         DEBUG_MISC("icmp6_input icmp sendto tx errno = %d-%s", errno,
-                   strerror(errno));
+                   g_strerror(errno));
         icmp6_send_error(m, ICMP6_UNREACH, ICMP6_UNREACH_NO_ROUTE);
         icmp_detach(so);
     }
@@ -265,7 +265,7 @@ void icmp6_receive(struct socket *so)
         } else {
             error_code = ICMP6_UNREACH_ADDRESS;
         }
-        DEBUG_MISC(" udp icmp rx errno = %d-%s", errno, strerror(errno));
+        DEBUG_MISC(" udp icmp rx errno = %d-%s", errno, g_strerror(errno));
         icmp6_send_error(so->so_m, ICMP_UNREACH, error_code);
     } else {
         icmp6_reflect(so->so_m);
@@ -583,7 +583,7 @@ void icmp6_input(struct mbuf *m)
 
             if (udp_attach(so, AF_INET6) == -1) {
                 DEBUG_MISC("icmp6_input udp_attach errno = %d-%s", errno,
-                           strerror(errno));
+                           g_strerror(errno));
                 sofree(so);
                 m_free(m);
                 goto end_error;
@@ -620,7 +620,7 @@ void icmp6_input(struct mbuf *m)
             if (sendto(so->s, icmp6_ping_msg, strlen(icmp6_ping_msg), 0,
                        (struct sockaddr *)&addr, sockaddr_size(&addr)) == -1) {
                 DEBUG_MISC("icmp6_input udp sendto tx errno = %d-%s", errno,
-                           strerror(errno));
+                           g_strerror(errno));
                 icmp6_send_error(m, ICMP6_UNREACH, ICMP6_UNREACH_NO_ROUTE);
                 udp_detach(so);
             }
