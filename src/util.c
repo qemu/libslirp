@@ -26,6 +26,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+/* slirp.h is not included here. However, if TARGET_WINVER is set,
+ * ensure that WINVER and _WIN32_WINNT are also properly set.
+ */
+#include "winver.h"
+
 #include <glib.h>
 #include <fcntl.h>
 #include <stdint.h>
