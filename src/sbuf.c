@@ -172,7 +172,7 @@ void sbcopy(struct sbuf *sb, size_t off, size_t len, char *to)
     if (ptr_diff == 0 && sb->sb_cc != 0 && sb->sb_cc != sb->sb_datalen) {
         g_error("sbcopy: ptr_diff == 0: sb->sb_cc (%" PRIu32 ") != sb->sb_datalen (%" PRIu32 "), sb->sb_cc != 0\n",
                    sb->sb_cc, sb->sb_datalen);
-    } else if (ptr_diff != (size_t) sb->sb_cc) {
+    } else if (ptr_diff != 0 && ptr_diff != (size_t) sb->sb_cc) {
         g_error("sbcopy: ptr_diff (%" SLIRP_PRIssize_t ") != sb->sb_cc (%" PRIu32 ")\n", ptr_diff, sb->sb_cc);
     } else if (len + off > (size_t) sb->sb_cc) {
         g_error("sbcopy: len (%" SLIRP_PRIsize_t ") + off (%" SLIRP_PRIsize_t ") > sb->sb_cc (%" PRIu32 ")\n",
