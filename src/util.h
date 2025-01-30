@@ -196,6 +196,20 @@ int slirp_getsockopt_wrap(slirp_os_socket sockfd, int level, int optname, void *
 int slirp_setsockopt_wrap(slirp_os_socket sockfd, int level, int optname,
                           const void *optval, int optlen);
 #define inet_aton slirp_inet_aton
+
+#if WINVER < 0x0601
+/* Windows versions older than Windows 7: */
+
+#undef inet_pton
+#undef inet_ntop
+
+#define inet_pton slirp_inet_pton
+#define inet_ntop slirp_inet_ntop
+
+int slirp_inet_pton(int af, const char *src, void *dst);
+const char *slirp_inet_ntop(int af, const void *src, char *dst, socklen_t size);
+#endif
+
 #else
 #define closesocket(s) close(s)
 #define ioctlsocket(s, r, v) ioctl(s, r, v)
