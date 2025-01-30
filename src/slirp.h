@@ -3,12 +3,22 @@
 #define SLIRP_H
 
 #ifdef _WIN32
+
+#if defined(TARGET_WINVER)
 /* TARGET_WINVER defined on the compiler command line? */
-#if defined(TARGET_WINVER) && !defined(WINVER)
+
+#  undef WINVER
+#  undef _WIN32_WINNT
 #  define WINVER TARGET_WINVER
-/* Default WINVER to Windows 7 API, same as glib. */
+#  define _WIN32_WINNT TARGET_WINVER
+
 #elif !defined(WINVER)
+/* Default WINVER to Windows 7 API, same as glib. */
+#  undef _WIN32_WINNT
+
 #  define WINVER 0x0601
+#  define _WIN32_WINNT WINVER
+
 #endif
 
 /* Ensure that _WIN32_WINNT matches WINVER */
