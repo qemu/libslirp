@@ -29,7 +29,7 @@ if fuzzer_build and fuzz_reproduce
 endif
 
 cc = meson.get_compiler('c')
-add_languages('cpp', required : fuzzer_build)
+add_languages('cpp', required : fuzzer_build, native : false)
 
 glib_static = get_option('static')
 
