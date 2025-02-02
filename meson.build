@@ -264,5 +264,6 @@ libslirp_libdep = declare_dependency(
   link_with : lib,
   include_directories : [include_directories('src'), include_directories('.')],
 )
+meson.override_dependency('slirp', libslirp_libdep)
 
 subdir('fuzzing')
