@@ -449,10 +449,7 @@ findso:
      * Reset idle time and keep-alive timer.
      */
     tp->t_idle = 0;
-    if (slirp_do_keepalive)
-        tp->t_timer[TCPT_KEEP] = TCPTV_KEEPINTVL;
-    else
-        tp->t_timer[TCPT_KEEP] = TCPTV_KEEP_IDLE;
+    tp->t_timer[TCPT_KEEP] = TCPTV_KEEP_IDLE;
 
     /*
      * Process options if not in LISTEN state,
