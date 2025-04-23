@@ -1140,7 +1140,7 @@ findso:
                  * we'll hang forever.
                  */
                 if (so->so_state & SS_FCANTRCVMORE) {
-                    tp->t_timer[TCPT_2MSL] = TCP_MAXIDLE;
+                    tp->t_timer[TCPT_2MSL] = TCP_LINGERTIME;
                 }
                 tp->t_state = TCPS_FIN_WAIT_2;
             }
