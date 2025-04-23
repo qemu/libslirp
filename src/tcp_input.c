@@ -449,7 +449,10 @@ findso:
      * Reset idle time and keep-alive timer.
      */
     tp->t_idle = 0;
-    tp->t_timer[TCPT_KEEP] = TCPTV_KEEP_IDLE;
+    if (tp->t_state < TCPS_ESTABLISHED)
+        tp->t_timer[TCPT_KEEP] = TCPTV_KEEP_INIT;
+    else
+        tp->t_timer[TCPT_KEEP] = TCPTV_KEEP_IDLE;
 
     /*
      * Process options if not in LISTEN state,
