@@ -1139,7 +1139,7 @@ findso:
                  * specification, but if we don't get a FIN
                  * we'll hang forever.
                  */
-                if (so->so_state & SS_FCANTRCVMORE) {
+                if (so->so_state & (SS_FCANTRCVMORE | SS_NOFDREF)) {
                     tp->t_timer[TCPT_2MSL] = TCP_LINGERTIME;
                 }
                 tp->t_state = TCPS_FIN_WAIT_2;
