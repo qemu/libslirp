@@ -968,7 +968,8 @@ void sofwdrain(struct socket *so)
 static bool sotranslate_out4(Slirp *s, struct socket *so, struct sockaddr_in *sin)
 {
     if (!s->disable_dns && so->so_faddr.s_addr == s->vnameserver_addr.s_addr) {
-        return so->so_fport == htons(53) && get_dns_addr(&sin->sin_addr) >= 0;
+        return (so->so_fport == htons(53) &&
+                get_dns_addr(&sin->sin_addr, &sin->sin_port) >= 0);
     }
 
     if (so->so_faddr.s_addr == s->vhost_addr.s_addr ||
@@ -987,7 +988,8 @@ static bool sotranslate_out6(Slirp *s, struct socket *so, struct sockaddr_in6 *s
 {
     if (!s->disable_dns && in6_equal(&so->so_faddr6, &s->vnameserver_addr6)) {
         uint32_t scope_id;
-        if (so->so_fport == htons(53) && get_dns6_addr(&sin->sin6_addr, &scope_id) >= 0) {
+        if (so->so_fport == htons(53) &&
+                get_dns6_addr(&sin->sin6_addr, &sin->sin6_port, &scope_id) >= 0) {
             sin->sin6_scope_id = scope_id;
             return true;
         }
@@ -1034,6 +1036,8 @@ void sotranslate_in(struct socket *so, struct sockaddr_storage *addr)
     struct sockaddr_in *sin = (struct sockaddr_in *)addr;
     struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)addr;
 
+    uint16_t dns_port;
+
     switch (addr->ss_family) {
     case AF_INET:
         if ((so->so_faddr.s_addr & slirp->vnetwork_mask.s_addr) ==
@@ -1047,6 +1051,13 @@ void sotranslate_in(struct socket *so, struct sockaddr_storage *addr)
                 sin->sin_addr = so->so_faddr;
             }
         }
+
+        struct in_addr sin_addr;
+        if (get_dns_addr(&sin_addr, &dns_port) >= 0 &&
+                sin->sin_port == dns_port &&
+                sin->sin_addr.s_addr == sin_addr.s_addr)
+            sin->sin_port = htons(53);
+
         break;
 
     case AF_INET6:
@@ -1057,6 +1068,15 @@ void sotranslate_in(struct socket *so, struct sockaddr_storage *addr)
                 sin6->sin6_addr = so->so_faddr6;
             }
         }
+
+        struct in6_addr sin6_addr;
+        uint32_t scope_id;
+        if (get_dns6_addr(&sin6_addr, &dns_port, &scope_id) >= 0 &&
+                sin6->sin6_port == dns_port &&
+                sin6->sin6_scope_id == scope_id &&
+                in6_equal(&sin6->sin6_addr, &sin6_addr))
+            sin6->sin6_port = htons(53);
+
         break;
 
     default:
