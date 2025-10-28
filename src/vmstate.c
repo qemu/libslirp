@@ -240,15 +240,13 @@ const VMStateInfo slirp_vmstate_info_tmp = {
 static int get_buffer(SlirpIStream *f, void *pv, size_t size,
                       const VMStateField *field)
 {
-    slirp_istream_read(f, pv, size);
-    return 0;
+    return slirp_istream_read(f, pv, size);
 }
 
 static int put_buffer(SlirpOStream *f, void *pv, size_t size,
                       const VMStateField *field)
 {
-    slirp_ostream_write(f, pv, size);
-    return 0;
+    return slirp_ostream_write(f, pv, size);
 }
 
 const VMStateInfo slirp_vmstate_info_buffer = {
