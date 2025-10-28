@@ -209,7 +209,9 @@ int soread(struct socket *so)
                 if (!shutdown_wr && getpeername(so->s, paddr, &alen) < 0) {
                     err = errno;
                 } else {
-                    getsockopt(so->s, SOL_SOCKET, SO_ERROR, &err, &elen);
+                    if (getsockopt(so->s, SOL_SOCKET, SO_ERROR, &err, &elen) < 0) {
+                        err = EIO;
+                    }
                 }
             }
 
