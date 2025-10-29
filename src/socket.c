@@ -210,7 +210,7 @@ int soread(struct socket *so)
                     err = errno;
                 } else {
                     if (getsockopt(so->s, SOL_SOCKET, SO_ERROR, &err, &elen) < 0) {
-                        err = EIO;
+                        err = errno;
                     }
                 }
             }
