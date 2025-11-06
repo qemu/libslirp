@@ -1589,7 +1589,7 @@ static bool check_guestfwd(Slirp *slirp, struct in_addr *guest_addr,
 
     /* check if the port is "bound" */
     for (tmp_ptr = slirp->guestfwd_list; tmp_ptr; tmp_ptr = tmp_ptr->ex_next) {
-        if (guest_port == tmp_ptr->ex_fport &&
+        if (guest_port == ntohs(tmp_ptr->ex_fport) &&
             guest_addr->s_addr == tmp_ptr->ex_addr.s_addr)
             return false;
     }
