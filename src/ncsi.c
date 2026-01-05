@@ -227,27 +227,27 @@ static const struct ncsi_rsp_handler {
     int payload;
     int (*handler)(Slirp *slirp, const struct ncsi_pkt_hdr *nh,
                    struct ncsi_rsp_pkt_hdr *rnh);
-} ncsi_rsp_handlers[] = { { NCSI_PKT_RSP_CIS, 4, NULL },
-                          { NCSI_PKT_RSP_SP, 4, NULL },
-                          { NCSI_PKT_RSP_DP, 4, NULL },
-                          { NCSI_PKT_RSP_EC, 4, NULL },
+} ncsi_rsp_handlers[] = { { NCSI_PKT_RSP_CIS, 4, NULL },     /* Clear Initial State */
+                          { NCSI_PKT_RSP_SP, 4, NULL },      /* Select Package */
+                          { NCSI_PKT_RSP_DP, 4, NULL },      /* Deselect Package */
+                          { NCSI_PKT_RSP_EC, 4, NULL },      /* Enable Channel */
                           { NCSI_PKT_RSP_DC, 4, NULL },
                           { NCSI_PKT_RSP_RC, 4, NULL },
-                          { NCSI_PKT_RSP_ECNT, 4, NULL },
+                          { NCSI_PKT_RSP_ECNT, 4, NULL },    /* Enable Channel TX */
                           { NCSI_PKT_RSP_DCNT, 4, NULL },
-                          { NCSI_PKT_RSP_AE, 4, NULL },
+                          { NCSI_PKT_RSP_AE, 4, NULL },      /* Enable AEN */
                           { NCSI_PKT_RSP_SL, 4, NULL },
                           { NCSI_PKT_RSP_GLS, 16, ncsi_rsp_handler_gls },
-                          { NCSI_PKT_RSP_SVF, 4, NULL },
-                          { NCSI_PKT_RSP_EV, 4, NULL },
-                          { NCSI_PKT_RSP_DV, 4, NULL },
-                          { NCSI_PKT_RSP_SMA, 4, NULL },
-                          { NCSI_PKT_RSP_EBF, 4, NULL },
+                          { NCSI_PKT_RSP_SVF, 4, NULL },     /* Set VLAN Filter */
+                          { NCSI_PKT_RSP_EV, 4, NULL },      /* Enable VLAN */
+                          { NCSI_PKT_RSP_DV, 4, NULL },      /* Disable VLAN */
+                          { NCSI_PKT_RSP_SMA, 4, NULL },     /* Set MAC Address */
+                          { NCSI_PKT_RSP_EBF, 4, NULL },     /* Enable Broadcast Filter */
                           { NCSI_PKT_RSP_DBF, 4, NULL },
                           { NCSI_PKT_RSP_EGMF, 4, NULL },
-                          { NCSI_PKT_RSP_DGMF, 4, NULL },
+                          { NCSI_PKT_RSP_DGMF, 4, NULL },    /* Disable Global Multicast Filter */
                           { NCSI_PKT_RSP_SNFC, 4, NULL },
-                          { NCSI_PKT_RSP_GVI, 40, ncsi_rsp_handler_gvi },
+                          { NCSI_PKT_RSP_GVI, 40, ncsi_rsp_handler_gvi },  /* Get Version ID */
                           { NCSI_PKT_RSP_GC, 32, ncsi_rsp_handler_gc },
                           { NCSI_PKT_RSP_GP, 40, ncsi_rsp_handler_gp },
                           { NCSI_PKT_RSP_GCPS, 172, NULL },
