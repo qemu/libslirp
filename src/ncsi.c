@@ -268,6 +268,12 @@ void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
 {
     const struct ncsi_pkt_hdr *nh =
         (const struct ncsi_pkt_hdr *)(pkt + ETH_HLEN);
+    /*
+     * Add 2-byte padding at start of buffer for proper alignment of IP header
+     * after 14-byte Ethernet header. This ensures the IP payload starts on a
+     * 4-byte boundary, which is required for optimal performance on many
+     * architectures and expected by slirp's packet handling code.
+     */
     uint8_t ncsi_reply[2 + ETH_HLEN + NCSI_MAX_LEN];
     struct ethhdr *reh = (struct ethhdr *)(ncsi_reply + 2);
     struct ncsi_rsp_pkt_hdr *rnh =
@@ -322,5 +328,6 @@ void ncsi_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
     *pchecksum = htonl(checksum);
     ncsi_rsp_len += 4;
 
+    /* Skip the 2-byte padding when sending the packet */
     slirp_send_packet_all(slirp, ncsi_reply + 2, ETH_HLEN + ncsi_rsp_len);
 }
