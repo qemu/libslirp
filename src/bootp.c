@@ -369,7 +369,8 @@ static void bootp_reply(Slirp *slirp,
            we assume that, if the bootfile parameter was configured as an http
            URL, the user intends to perform UEFI HTTP boot, so send this option
            automatically */
-        if (slirp->bootp_filename && g_str_has_prefix(slirp->bootp_filename, "http://")) {
+        if (slirp->bootp_filename && (g_str_has_prefix(slirp->bootp_filename, "http://") ||
+                                      g_str_has_prefix(slirp->bootp_filename, "https://"))) {
             val = strlen(UEFI_HTTP_VENDOR_CLASS_ID);
             if (q + val + 2 >= end) {
                 g_warning("DHCP packet size exceeded, "
