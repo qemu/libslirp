@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.9.2] - 2026-05-23
+
+## Security
+
+  - oob: cap urgent data count to what is actually available #93
+
+### Fixed
+
+  - honor dns server port number on macos !153
+  - cope with SO_ERROR possibly failing
+  - vmstate: pass on read/write errors for state
+  - fix port conflict #92
+  - tcp_sockclosed: Set linger timer on remaining closing states
+
+### Changed
+
+  - bootp: allow https for UEFI HTTP boot !156
+
 ## [4.9.1] - 2025-05-28
 
 ### Fixed
