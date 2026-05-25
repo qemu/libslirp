@@ -283,7 +283,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Standalone project, removing any QEMU dependency.
  - License clarifications.
 
-[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.1...master
+[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.2...master
+[4.9.2]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.1...v4.9.2
 [4.9.1]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.0...v4.9.1
 [4.9.0]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.8.0...v4.9.0
 [4.8.0]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.7.0...v4.8.0
