@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.9.3] - 2026-05-26
+
+### Fixed
+
+  - Fix migration break on incorrect vmstate retcode #94 !157
+
 ## [4.9.2] - 2026-05-23
 
 ## Security
@@ -283,7 +289,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Standalone project, removing any QEMU dependency.
  - License clarifications.
 
-[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.2...master
+[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.3...master
+[4.9.3]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.2...v4.9.3
 [4.9.2]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.1...v4.9.2
 [4.9.1]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.0...v4.9.1
 [4.9.0]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.8.0...v4.9.0
