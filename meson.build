@@ -238,6 +238,16 @@ ncsitest = executable('ncsitest', 'test/ncsitest.c',
 
 test('ncsi', ncsitest)
 
+guestfwdtest = executable('guestfwdtest', 'test/guestfwdtest.c',
+  link_with: [lib],
+  c_args : cargs,
+  link_args : vflag,
+  include_directories: ['src'],
+  dependencies: libslirp_deps
+)
+
+test('guestfwd', guestfwdtest)
+
 if install_devel
   install_headers(['src/libslirp.h'], subdir : 'slirp')
 
