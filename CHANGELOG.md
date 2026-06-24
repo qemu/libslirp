@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Security
 
-  - oob: cap urgent data count to what is actually available #93
+  - oob: cap urgent data count to what is actually available #93 (CVE-2026-9539)
 
 ### Fixed
 
