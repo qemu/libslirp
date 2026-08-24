@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.9.4] - 2026-08-25
+
+## Security
+
+  - Fix information leak on fragmented packets with different header lengths
+
+### Fixed
+
+  - Fix reporting oob output #95
+  - Fix buffer trimming to ip6-announced length #96
+
+## Changed
+
+  - slirp: permit guestfwd to vhost_addr/vnameserver_addr #81 #140
+
 ## [4.9.3] - 2026-05-26
 
 ### Fixed
@@ -289,7 +304,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Standalone project, removing any QEMU dependency.
  - License clarifications.
 
-[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.3...master
+[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.4...master
+[4.9.4]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.3...v4.9.4
 [4.9.3]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.2...v4.9.3
 [4.9.2]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.1...v4.9.2
 [4.9.1]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.0...v4.9.1
