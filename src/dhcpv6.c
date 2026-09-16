@@ -185,13 +185,14 @@ static void dhcpv6_info_request(Slirp *slirp, struct sockaddr_in6 *srcsas,
         uint8_t *sa = slirp->vhost_addr6.s6_addr;
         int slen, smaxlen;
 
-        *resp++ = OPTION_BOOTFILE_URL >> 8; /* option-code high byte */
-        *resp++ = OPTION_BOOTFILE_URL; /* option-code low byte */
-        smaxlen = (uint8_t *)m->m_data + slirp->if_mtu - (resp + 2);
+        smaxlen = (uint8_t *)m->m_data + slirp->if_mtu - (resp + 4);
         if (smaxlen < 0) {
             m_free(m); /* boot-url would not fit the interface-MTU-sized mbuf */
             return;
         }
+
+        *resp++ = OPTION_BOOTFILE_URL >> 8; /* option-code high byte */
+        *resp++ = OPTION_BOOTFILE_URL; /* option-code low byte */
         slen = slirp_fmt((char *)resp + 2, smaxlen,
                          "tftp://[%02x%02x:%02x%02x:%02x%02x:%02x%02x:"
                          "%02x%02x:%02x%02x:%02x%02x:%02x%02x]/%s",
