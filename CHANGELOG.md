@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Security
 
-  - Fix bounds-check in processing OEM commands
-  - Fix bounds-check in dhcpv6 against MTU
+  - Fix bounds-check in processing OEM commands (CVE-2026-95507)
+  - Fix bounds-check in dhcpv6 against MTU (CVE-2026-95508)
 
 ### Fixed
 
