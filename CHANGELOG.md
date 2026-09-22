@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.9.5] - 2026-09-22
+
+## Security
+
+  - Fix bounds-check in processing OEM commands
+  - Fix bounds-check in dhcpv6 against MTU
+
+### Fixed
+
+  - Fix blocking sendto on UDP ockets #97
+
 ## [4.9.4] - 2026-08-25
 
 ## Security
@@ -304,7 +315,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Standalone project, removing any QEMU dependency.
  - License clarifications.
 
-[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.4...master
+[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.5...master
+[4.9.5]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.4...v4.9.5
 [4.9.4]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.3...v4.9.4
 [4.9.3]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.2...v4.9.3
 [4.9.2]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.1...v4.9.2
