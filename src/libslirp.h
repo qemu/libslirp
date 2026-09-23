@@ -286,6 +286,8 @@ typedef struct SlirpConfig {
      * Explicit nonzero values must be at least 1280. */
     size_t if_mtu6;
     size_t if_mru6;
+    /* Advertise a zero IPv6 router lifetime instead of a default route. */
+    bool disable_ipv6_default_route;
 } SlirpConfig;
 
 /* Create a new instance of a slirp stack */

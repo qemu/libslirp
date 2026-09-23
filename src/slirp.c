@@ -779,6 +779,10 @@ Slirp *slirp_new(const SlirpConfig *cfg, const SlirpCb *callbacks, void *opaque)
                 slirp->loopback_map_len = len;
             }
         }
+
+        slirp->disable_ipv6_default_route = cfg->disable_ipv6_default_route;
+    } else {
+        slirp->disable_ipv6_default_route = false;
     }
 
     ip6_post_init(slirp);

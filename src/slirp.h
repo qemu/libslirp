@@ -146,6 +146,7 @@ struct Slirp {
     uint8_t vprefix_len;
     struct in6_addr vhost_addr6;
     bool forward_broadcast;
+    bool disable_ipv6_default_route; /* do not advertise an IPv6 default route */
     bool disable_dhcp; /* slirp will not reply to any DHCP requests */
     struct in_addr vdhcp_startaddr;
     struct in_addr vnameserver_addr;

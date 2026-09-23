@@ -321,7 +321,8 @@ static void ndp_send_ra(Slirp *slirp)
     ricmp->icmp6_nra.M = NDP_AdvManagedFlag;
     ricmp->icmp6_nra.O = NDP_AdvOtherConfigFlag;
     ricmp->icmp6_nra.reserved = 0;
-    ricmp->icmp6_nra.lifetime = htons(NDP_AdvDefaultLifetime);
+    ricmp->icmp6_nra.lifetime = htons(slirp->disable_ipv6_default_route ? 0 :
+                                      NDP_AdvDefaultLifetime);
     ricmp->icmp6_nra.reach_time = htonl(NDP_AdvReachableTime);
     ricmp->icmp6_nra.retrans_time = htonl(NDP_AdvRetransTime);
     t->m_data += ICMP6_NDP_RA_MINLEN;
