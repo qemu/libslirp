@@ -641,6 +641,9 @@ Slirp *slirp_new(const SlirpConfig *cfg, const SlirpCb *callbacks, void *opaque)
     g_return_val_if_fail(!cfg->bootfile ||
                          (strlen(cfg->bootfile) <
                           G_SIZEOF_MEMBER(struct bootp_t, bp_file)), NULL);
+    if (cfg->version >= 7) {
+        g_return_val_if_fail(cfg->hostfwd_listen_backlog >= 0, NULL);
+    }
 
     slirp = g_malloc0(sizeof(Slirp));
 
@@ -718,6 +721,13 @@ Slirp *slirp_new(const SlirpConfig *cfg, const SlirpCb *callbacks, void *opaque)
         memset(slirp->oob_eth_addr, 0, ETH_ALEN);
     }
 
+    slirp->hostfwd_listen_backlog = 1;
+    if (cfg->version >= 7) {
+        slirp->forward_broadcast = cfg->forward_broadcast;
+        if (cfg->hostfwd_listen_backlog) {
+            slirp->hostfwd_listen_backlog = cfg->hostfwd_listen_backlog;
+        }
+    }
     ip6_post_init(slirp);
     return slirp;
 }

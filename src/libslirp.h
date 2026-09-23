@@ -158,7 +158,7 @@ typedef struct SlirpCb {
 } SlirpCb;
 
 #define SLIRP_CONFIG_VERSION_MIN 1
-#define SLIRP_CONFIG_VERSION_MAX 6
+#define SLIRP_CONFIG_VERSION_MAX 7
 
 typedef struct SlirpConfig {
     /* Version must be provided */
@@ -246,6 +246,15 @@ typedef struct SlirpConfig {
      * retrieved through NC-SI.
      */
     uint8_t oob_eth_addr[6];
+
+    /*
+     * Fields introduced in SlirpConfig version 7 begin.
+     */
+    /* Forward IPv4 broadcast packets to the host network. Default: false. */
+    bool forward_broadcast;
+    /* Pending host-forwarded TCP connections passed to listen().
+     * Zero selects the historical default of one; negative values are invalid. */
+    int hostfwd_listen_backlog;
 } SlirpConfig;
 
 /* Create a new instance of a slirp stack */

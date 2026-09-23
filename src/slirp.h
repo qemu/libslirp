@@ -145,6 +145,7 @@ struct Slirp {
     struct in6_addr vprefix_addr6;
     uint8_t vprefix_len;
     struct in6_addr vhost_addr6;
+    bool forward_broadcast;
     bool disable_dhcp; /* slirp will not reply to any DHCP requests */
     struct in_addr vdhcp_startaddr;
     struct in_addr vnameserver_addr;
@@ -163,6 +164,7 @@ struct Slirp {
 
     uint32_t mfr_id;
     uint8_t oob_eth_addr[ETH_ALEN];
+    int hostfwd_listen_backlog;
 
     /* mbuf states */
     struct slirp_quehead m_freelist;

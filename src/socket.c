@@ -876,7 +876,7 @@ struct socket *tcpx_listen(Slirp *slirp,
         (haddr->sa_family == AF_INET6 && slirp_socket_set_v6only(s, (flags & SS_HOSTFWD_V6ONLY) != 0) < 0) ||
         (slirp_socket_set_fast_reuse(s) < 0) ||
         (bind(s, haddr, haddrlen) < 0) ||
-        (listen(s, 1) < 0)) {
+        (listen(s, slirp->hostfwd_listen_backlog) < 0)) {
         int tmperrno = errno; /* Don't clobber the real reason we failed */
         if (have_valid_socket(s)) {
             closesocket(s);
@@ -987,8 +987,13 @@ static bool sotranslate_out4(Slirp *s, struct socket *so, struct sockaddr_in *si
         return get_dns_addr(&sin->sin_addr, &sin->sin_port) >= 0;
     }
 
-    if (so->so_faddr.s_addr == s->vhost_addr.s_addr ||
-        so->so_faddr.s_addr == 0xffffffff) {
+    if (s->forward_broadcast &&
+        (so->so_faddr.s_addr == 0xffffffff ||
+         so->so_faddr.s_addr ==
+             (s->vnetwork_addr.s_addr | ~s->vnetwork_mask.s_addr))) {
+        sin->sin_addr.s_addr = 0xffffffff;
+    } else if (so->so_faddr.s_addr == s->vhost_addr.s_addr ||
+               so->so_faddr.s_addr == 0xffffffff) {
         if (s->disable_host_loopback) {
             return false;
         }

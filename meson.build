@@ -295,3 +295,13 @@ gatewaydnstest = executable('gatewaydnstest', 'test/gatewaydnstest.c',
   dependencies: libslirp_deps,
 )
 test('gatewaydns', gatewaydnstest)
+
+broadcasttest = executable('broadcasttest', 'test/broadcasttest.c',
+  objects: lib.extract_all_objects(recursive: false),
+  c_args: cargs,
+  link_args: vflag,
+  include_directories: ['src'],
+  dependencies: libslirp_deps,
+)
+test('broadcast', broadcasttest)
+

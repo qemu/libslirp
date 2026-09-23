@@ -221,6 +221,12 @@ void udp_input(register struct mbuf *m, int iphlen)
         goto bad;
     }
     setsockopt(so->s, IPPROTO_IP, IP_TTL, (const void *) &ttl, sizeof(ttl));
+    if (slirp->forward_broadcast &&
+        (so->so_faddr.s_addr ==
+             (slirp->vnetwork_addr.s_addr | ~slirp->vnetwork_mask.s_addr) ||
+         so->so_faddr.s_addr == 0xffffffff)) {
+        setsockopt(so->s, SOL_SOCKET, SO_BROADCAST, &(int){ 1 }, sizeof(int));
+    }
 
     /*
      * Now we sendto() the packet.
