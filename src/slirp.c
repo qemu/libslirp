@@ -780,6 +780,19 @@ Slirp *slirp_new(const SlirpConfig *cfg, const SlirpCb *callbacks, void *opaque)
             }
         }
 
+        if (cfg->advertised_nameservers && cfg->advertised_nameservers_len > 0) {
+            slirp->advertised_nameservers = g_malloc_n(cfg->advertised_nameservers_len, sizeof(*slirp->advertised_nameservers));
+            memcpy(slirp->advertised_nameservers, cfg->advertised_nameservers,
+                   cfg->advertised_nameservers_len * sizeof(*slirp->advertised_nameservers));
+            slirp->advertised_nameservers_len = cfg->advertised_nameservers_len;
+        }
+        if (cfg->advertised_nameservers6 && cfg->advertised_nameservers6_len > 0) {
+            slirp->advertised_nameservers6 = g_malloc_n(cfg->advertised_nameservers6_len, sizeof(*slirp->advertised_nameservers6));
+            memcpy(slirp->advertised_nameservers6, cfg->advertised_nameservers6,
+                   cfg->advertised_nameservers6_len * sizeof(*slirp->advertised_nameservers6));
+            slirp->advertised_nameservers6_len = cfg->advertised_nameservers6_len;
+        }
+
         slirp->disable_ipv6_default_route = cfg->disable_ipv6_default_route;
     } else {
         slirp->disable_ipv6_default_route = false;
@@ -841,6 +854,8 @@ void slirp_cleanup(Slirp *slirp)
     tftp_cleanup(slirp);
 
     g_free(slirp->loopback_map);
+    g_free(slirp->advertised_nameservers);
+    g_free(slirp->advertised_nameservers6);
     g_rand_free(slirp->grand);
 
     g_free(slirp->vdnssearch);

@@ -281,10 +281,21 @@ static void bootp_reply(Slirp *slirp,
             memcpy(q, &saddr.sin_addr, 4);
             q += 4;
 
-            *q++ = RFC1533_DNS;
-            *q++ = 4;
-            memcpy(q, &slirp->vnameserver_addr, 4);
-            q += 4;
+            if (slirp->advertised_nameservers_len > 0 && slirp->advertised_nameservers) {
+                unsigned int nameservers_len = MIN(slirp->advertised_nameservers_len,
+                                           (size_t)UINT8_MAX / sizeof(struct in_addr));
+
+                *q++ = RFC1533_DNS;
+                *q++ = nameservers_len * sizeof(struct in_addr);
+                memcpy(q, slirp->advertised_nameservers,
+                       nameservers_len * sizeof(struct in_addr));
+                q += nameservers_len * sizeof(struct in_addr);
+            } else {
+                *q++ = RFC1533_DNS;
+                *q++ = 4;
+                memcpy(q, &slirp->vnameserver_addr, 4);
+                q += 4;
+            }
         }
 
         *q++ = RFC2132_LEASE_TIME;

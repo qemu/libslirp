@@ -288,6 +288,20 @@ typedef struct SlirpConfig {
     size_t if_mru6;
     /* Advertise a zero IPv6 router lifetime instead of a default route. */
     bool disable_ipv6_default_route;
+
+    /* IPv4 DNS servers advertised via DHCP, in network byte order.
+     * Copied by slirp_new(); the caller retains ownership. An empty list
+     * advertises vnameserver. Packets truncate lists to fit their MTU. */
+    const struct in_addr *advertised_nameservers;
+    /* Number of entries in advertised_nameservers. */
+    unsigned int advertised_nameservers_len;
+
+    /* IPv6 DNS servers advertised via DHCPv6 and RDNSS. Copied by
+     * slirp_new(); the caller retains ownership. An empty list uses the
+     * virtual DNS proxy, as with older configuration versions. */
+    const struct in6_addr *advertised_nameservers6;
+    /* Number of entries in advertised_nameservers6. */
+    unsigned int advertised_nameservers6_len;
 } SlirpConfig;
 
 /* Create a new instance of a slirp stack */

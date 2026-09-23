@@ -301,9 +301,6 @@ static void ndp_send_ra(Slirp *slirp)
     struct mbuf *t = m_get(slirp);
     struct ip6 *rip = mtod(t, struct ip6 *);
     size_t pl_size = 0;
-    struct in6_addr addr;
-    uint16_t port;
-    uint32_t scope_id;
 
     rip->ip_src = (struct in6_addr)LINKLOCAL_ADDR;
     rip->ip_dst = (struct in6_addr)ALLNODES_MULTICAST;
@@ -351,17 +348,51 @@ static void ndp_send_ra(Slirp *slirp)
     t->m_data += NDPOPT_PREFIXINFO_LEN;
     pl_size += NDPOPT_PREFIXINFO_LEN;
 
-    /* Prefix information (NDP option) */
-    if (get_dns6_addr(&addr, &port, &scope_id) >= 0) {
-        /* Host system does have an IPv6 DNS server, announce our proxy.  */
+    const struct in6_addr *nameservers = slirp->advertised_nameservers6;
+    unsigned int nameservers_len = slirp->advertised_nameservers6_len;
+    const size_t ra_fixed_size = sizeof(struct ip6) + ICMP6_NDP_RA_MINLEN
+                           + NDPOPT_LINKLAYER_LEN + NDPOPT_PREFIXINFO_LEN;
+    const size_t rdnss_header_size = NDPOPT_RDNSS_HEADER_LEN;
+    const size_t nameservers_max_opt = (UINT8_MAX - (rdnss_header_size / 8))
+                                      / (sizeof(struct in6_addr) / 8);
+    const size_t nameservers_max_pkt = (slirp->if_mtu > ra_fixed_size + rdnss_header_size)
+                                      ? ((size_t)slirp->if_mtu - ra_fixed_size - rdnss_header_size)
+                                        / sizeof(struct in6_addr)
+                                      : 0;
+
+    if (nameservers_len == 0 || !nameservers) {
+        struct in6_addr addr;
+        uint16_t port;
+        uint32_t scope_id;
+
+        nameservers = &slirp->vnameserver_addr6;
+        nameservers_len = get_dns6_addr(&addr, &port, &scope_id) >= 0 ? 1 : 0;
+    }
+
+    if (nameservers_len > nameservers_max_opt || nameservers_len > nameservers_max_pkt) {
+        size_t nameservers_clamped = MIN(nameservers_max_opt, nameservers_max_pkt);
+
+        if (nameservers_clamped == 0) {
+            g_warning("MTU is too small to hold an RDNSS option");
+        } else {
+            g_warning("RDNSS option truncated to fit router advertisement");
+        }
+        nameservers_len = nameservers_clamped;
+    }
+
+    if (nameservers_len > 0) {
+        size_t option_size = rdnss_header_size + nameservers_len * sizeof(struct in6_addr);
         struct ndpopt *opt3 = mtod(t, struct ndpopt *);
+
         opt3->ndpopt_type = NDPOPT_RDNSS;
-        opt3->ndpopt_len = NDPOPT_RDNSS_LEN / 8;
+        opt3->ndpopt_len = (uint8_t)(option_size / 8);
         opt3->ndpopt_rdnss.reserved = 0;
         opt3->ndpopt_rdnss.lifetime = htonl(2 * NDP_MaxRtrAdvInterval);
-        opt3->ndpopt_rdnss.addr = slirp->vnameserver_addr6;
-        t->m_data += NDPOPT_RDNSS_LEN;
-        pl_size += NDPOPT_RDNSS_LEN;
+        memcpy(&opt3->ndpopt_rdnss.addr, nameservers,
+               nameservers_len * sizeof(struct in6_addr));
+
+        t->m_data += option_size;
+        pl_size += option_size;
     }
 
     rip->ip_pl = htons(pl_size);

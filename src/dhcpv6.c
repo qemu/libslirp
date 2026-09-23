@@ -170,16 +170,28 @@ static void dhcpv6_info_request(Slirp *slirp, struct sockaddr_in6 *srcsas,
         resp += ri.client_id_len;
     }
     if (ri.want_dns) {
-        if (resp + 4 + 16 > (uint8_t *)m->m_data + slirp->if_mtu6) {
-            m_free(m); /* reply would not fit the interface-MTU-sized mbuf */
+        const struct in6_addr *nameservers = slirp->advertised_nameservers6;
+        unsigned int nameservers_len = slirp->advertised_nameservers6_len;
+        size_t room = (uint8_t *)m->m_data + slirp->if_mtu6 - resp;
+        uint16_t nameservers_size;
+
+        if (room < 4 + sizeof(struct in6_addr)) {
+            m_free(m);
             return;
         }
-        *resp++ = OPTION_DNS_SERVERS >> 8; /* option-code high byte */
-        *resp++ = OPTION_DNS_SERVERS; /* option-code low byte */
-        *resp++ = 0; /* option-len high byte */
-        *resp++ = 16; /* option-len low byte */
-        memcpy(resp, &slirp->vnameserver_addr6, 16);
-        resp += 16;
+        if (!nameservers_len) {
+            nameservers = &slirp->vnameserver_addr6;
+            nameservers_len = 1;
+        }
+        nameservers_len = MIN(nameservers_len,
+                              MIN(UINT16_MAX, room - 4) / sizeof(*nameservers));
+        nameservers_size = nameservers_len * sizeof(*nameservers);
+        *resp++ = OPTION_DNS_SERVERS >> 8;
+        *resp++ = OPTION_DNS_SERVERS;
+        *resp++ = nameservers_size >> 8;
+        *resp++ = nameservers_size;
+        memcpy(resp, nameservers, nameservers_size);
+        resp += nameservers_size;
     }
     if (ri.want_boot_url) {
         uint8_t *sa = slirp->vhost_addr6.s6_addr;

@@ -296,6 +296,15 @@ gatewaydnstest = executable('gatewaydnstest', 'test/gatewaydnstest.c',
 )
 test('gatewaydns', gatewaydnstest)
 
+dnspackettest = executable('dnspackettest', 'test/dnspackettest.c',
+  objects: lib.extract_all_objects(recursive: false),
+  c_args: cargs,
+  link_args: vflag,
+  include_directories: ['src'],
+  dependencies: libslirp_deps,
+)
+test('dnspacket', dnspackettest)
+
 broadcasttest = executable('broadcasttest', 'test/broadcasttest.c',
   objects: lib.extract_all_objects(recursive: false),
   c_args: cargs,

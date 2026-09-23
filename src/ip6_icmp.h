@@ -159,7 +159,8 @@ struct ndpopt {
 /* NDP options size, in octets. */
 #define NDPOPT_LINKLAYER_LEN 8
 #define NDPOPT_PREFIXINFO_LEN 32
-#define NDPOPT_RDNSS_LEN 24
+#define NDPOPT_RDNSS_HEADER_LEN 8
+#define NDPOPT_RDNSS_LEN (NDPOPT_RDNSS_HEADER_LEN + sizeof(struct in6_addr))
 
 /*
  * Definition of type and code field values.

@@ -227,6 +227,10 @@ struct Slirp {
     struct sockaddr_in *outbound_addr;
     struct sockaddr_in6 *outbound_addr6;
     bool disable_dns; /* slirp will not redirect/serve any DNS packet */
+    struct in_addr *advertised_nameservers;
+    unsigned int advertised_nameservers_len;
+    struct in6_addr *advertised_nameservers6;
+    unsigned int advertised_nameservers6_len;
 };
 
 /*
