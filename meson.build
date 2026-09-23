@@ -277,3 +277,12 @@ libslirp_libdep = declare_dependency(
 meson.override_dependency('slirp', libslirp_libdep)
 
 subdir('fuzzing')
+
+icmpttltest = executable('icmpttltest', 'test/icmpttltest.c',
+  objects: lib.extract_all_objects(recursive: false),
+  c_args: cargs,
+  link_args: vflag,
+  include_directories: ['src'],
+  dependencies: libslirp_deps,
+)
+test('icmpttl', icmpttltest)
