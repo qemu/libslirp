@@ -296,6 +296,15 @@ gatewaydnstest = executable('gatewaydnstest', 'test/gatewaydnstest.c',
 )
 test('gatewaydns', gatewaydnstest)
 
+dnsconfigtest = executable('dnsconfigtest', 'test/dnsconfigtest.c',
+  link_with: [lib],
+  c_args: cargs,
+  link_args: vflag,
+  include_directories: ['src'],
+  dependencies: libslirp_deps,
+)
+test('dnsconfig', dnsconfigtest)
+
 dnspackettest = executable('dnspackettest', 'test/dnspackettest.c',
   objects: lib.extract_all_objects(recursive: false),
   c_args: cargs,

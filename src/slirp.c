@@ -1837,3 +1837,90 @@ void slirp_send_packet_all(Slirp *slirp, const void *buf, size_t len)
                     (unsigned long)len);
     }
 }
+
+struct in_addr slirp_get_vnetwork(Slirp *slirp)
+{
+    return slirp->vnetwork_addr;
+}
+
+void slirp_set_vdomainname(Slirp *slirp, const char *name)
+{
+    char *copy = g_strdup(name);
+
+    g_free(slirp->vdomainname);
+    slirp->vdomainname = copy;
+}
+
+const char *slirp_get_vdomainname(Slirp *slirp)
+{
+    return slirp->vdomainname;
+}
+
+int slirp_set_vdnssearch(Slirp *slirp, const char *const *names)
+{
+    uint8_t *old = slirp->vdnssearch;
+    int ret;
+
+    if (!names) {
+        slirp->vdnssearch = NULL;
+        slirp->vdnssearch_len = 0;
+    } else {
+        ret = translate_dnssearch(slirp, (const char **)names);
+        if (ret < 0) {
+            return ret;
+        }
+    }
+    g_free(old);
+    return 0;
+}
+
+void slirp_set_vnameserver(Slirp *slirp, struct in_addr addr)
+{
+    slirp->vnameserver_addr = addr;
+}
+
+void slirp_set_vnameserver6(Slirp *slirp, struct in6_addr addr)
+{
+    slirp->vnameserver_addr6 = addr;
+}
+
+void slirp_set_disable_dns(Slirp *slirp, bool disable)
+{
+    slirp->disable_dns = disable;
+}
+
+int slirp_set_advertised_nameservers(Slirp *slirp, unsigned int len,
+                                      const struct in_addr *addrs)
+{
+    struct in_addr *copy = NULL;
+
+    if (len) {
+        if (!addrs) {
+            return -1;
+        }
+        copy = g_malloc_n(len, sizeof(*copy));
+        memcpy(copy, addrs, len * sizeof(*copy));
+    }
+    g_free(slirp->advertised_nameservers);
+    slirp->advertised_nameservers = copy;
+    slirp->advertised_nameservers_len = len;
+    return 0;
+}
+
+int slirp_set_advertised_nameservers6(Slirp *slirp, unsigned int len,
+                                      const struct in6_addr *addrs)
+{
+    struct in6_addr *copy = NULL;
+
+    if (len) {
+        if (!addrs) {
+            return -1;
+        }
+        copy = g_malloc_n(len, sizeof(*copy));
+        memcpy(copy, addrs, len * sizeof(*copy));
+    }
+    g_free(slirp->advertised_nameservers6);
+    slirp->advertised_nameservers6 = copy;
+    slirp->advertised_nameservers6_len = len;
+    return 0;
+}

@@ -448,6 +448,39 @@ int slirp_state_load(Slirp *s, int version_id, SlirpReadCb read_cb,
 SLIRP_EXPORT
 const char *slirp_version_string(void);
 
+/* Return the configured virtual IPv4 network, in network byte order. */
+SLIRP_EXPORT
+struct in_addr slirp_get_vnetwork(Slirp *slirp);
+/* Copy the DHCP domain name. NULL clears it. */
+SLIRP_EXPORT
+void slirp_set_vdomainname(Slirp *slirp, const char *name);
+/* Borrow the domain name until the next setter call or slirp_cleanup(). */
+SLIRP_EXPORT
+const char *slirp_get_vdomainname(Slirp *slirp);
+/* Copy a NULL-terminated search list; NULL clears it. Return 0 on success,
+ * a negative value on invalid input, leaving the previous list intact. */
+SLIRP_EXPORT
+int slirp_set_vdnssearch(Slirp *slirp, const char *const *names);
+/* Change the guest-visible IPv4 DNS proxy address, in network byte order. */
+SLIRP_EXPORT
+void slirp_set_vnameserver(Slirp *slirp, struct in_addr addr);
+/* Change the guest-visible IPv6 DNS proxy address. */
+SLIRP_EXPORT
+void slirp_set_vnameserver6(Slirp *slirp, struct in6_addr addr);
+/* Enable/disable forwarding by the built-in DNS proxy. */
+SLIRP_EXPORT
+void slirp_set_disable_dns(Slirp *slirp, bool disable);
+/* Copy an advertised DNS list. Zero length restores the virtual DNS proxy.
+ * Return 0 on success, -1 for a nonzero length with a NULL pointer.
+ * Updates affect subsequent DHCP replies and router advertisements. */
+SLIRP_EXPORT
+int slirp_set_advertised_nameservers(Slirp *slirp, unsigned int len,
+                                     const struct in_addr *addrs);
+/* IPv6 counterpart of slirp_set_advertised_nameservers(). */
+SLIRP_EXPORT
+int slirp_set_advertised_nameservers6(Slirp *slirp, unsigned int len,
+                                      const struct in6_addr *addrs);
+
 /* Debugging support: There are two methods for enabling debugging
  * in libslirp: the SLIRP_DEBUG environment variable and the
  * slirp_(set|reset)_debug() functions.

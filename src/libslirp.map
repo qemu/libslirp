@@ -44,3 +44,15 @@ SLIRP_4.9 {
     slirp_set_debug;
     slirp_reset_debug;
 } SLIRP_4.7;
+
+SLIRP_4.10 {
+    slirp_get_vnetwork;
+    slirp_set_vdomainname;
+    slirp_get_vdomainname;
+    slirp_set_vdnssearch;
+    slirp_set_vnameserver;
+    slirp_set_vnameserver6;
+    slirp_set_disable_dns;
+    slirp_set_advertised_nameservers;
+    slirp_set_advertised_nameservers6;
+} SLIRP_4.9;
