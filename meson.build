@@ -286,3 +286,12 @@ icmpttltest = executable('icmpttltest', 'test/icmpttltest.c',
   dependencies: libslirp_deps,
 )
 test('icmpttl', icmpttltest)
+
+gatewaydnstest = executable('gatewaydnstest', 'test/gatewaydnstest.c',
+  objects: lib.extract_all_objects(recursive: false),
+  c_args: cargs,
+  link_args: vflag,
+  include_directories: ['src'],
+  dependencies: libslirp_deps,
+)
+test('gatewaydns', gatewaydnstest)
