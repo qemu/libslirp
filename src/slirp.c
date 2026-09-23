@@ -643,6 +643,7 @@ Slirp *slirp_new(const SlirpConfig *cfg, const SlirpCb *callbacks, void *opaque)
                           G_SIZEOF_MEMBER(struct bootp_t, bp_file)), NULL);
     if (cfg->version >= 7) {
         g_return_val_if_fail(cfg->hostfwd_listen_backlog >= 0, NULL);
+        g_return_val_if_fail(!(cfg->shared_mac[0] & 1), NULL);
     }
 
     slirp = g_malloc0(sizeof(Slirp));
@@ -727,7 +728,12 @@ Slirp *slirp_new(const SlirpConfig *cfg, const SlirpCb *callbacks, void *opaque)
         if (cfg->hostfwd_listen_backlog) {
             slirp->hostfwd_listen_backlog = cfg->hostfwd_listen_backlog;
         }
+
+        static const uint8_t zero_mac[ETH_ALEN];
+        memcpy(slirp->shared_mac, cfg->shared_mac, ETH_ALEN);
+        slirp->has_shared_mac = memcmp(cfg->shared_mac, zero_mac, ETH_ALEN) != 0;
     }
+
     ip6_post_init(slirp);
     return slirp;
 }
@@ -1215,6 +1221,17 @@ void slirp_pollfds_poll(Slirp *slirp, int select_error,
     if_start(slirp);
 }
 
+static void in4_compute_ethaddr(Slirp *slirp, struct in_addr ip,
+                               uint8_t eth[ETH_ALEN])
+{
+    if (slirp->has_shared_mac) {
+        memcpy(eth, slirp->shared_mac, ETH_ALEN);
+    } else {
+        memcpy(eth, special_ethaddr, ETH_ALEN - 4);
+        memcpy(&eth[2], &ip.s_addr, 4);
+    }
+}
+
 static void arp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
 {
     const struct slirp_arphdr *ah =
@@ -1261,8 +1278,8 @@ static void arp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
 
             /* ARP request for alias/dns mac address */
             memcpy(reh->h_dest, pkt + ETH_ALEN, ETH_ALEN);
-            memcpy(reh->h_source, special_ethaddr, ETH_ALEN - 4);
-            memcpy(&reh->h_source[2], &ah->ar_tip, 4);
+            struct in_addr target = { .s_addr = ah->ar_tip };
+            in4_compute_ethaddr(slirp, target, reh->h_source);
             reh->h_proto = htons(ETH_P_ARP);
 
             rah->ar_hrd = htons(1);
@@ -1347,8 +1364,7 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, struct ethhdr *eh,
         if (!ifm->resolution_requested) {
             /* If the client addr is not known, send an ARP request */
             memset(reh->h_dest, 0xff, ETH_ALEN);
-            memcpy(reh->h_source, special_ethaddr, ETH_ALEN - 4);
-            memcpy(&reh->h_source[2], &slirp->vhost_addr, 4);
+            in4_compute_ethaddr(slirp, slirp->vhost_addr, reh->h_source);
             reh->h_proto = htons(ETH_P_ARP);
             rah->ar_hrd = htons(1);
             rah->ar_pro = htons(ETH_P_IP);
@@ -1357,8 +1373,7 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, struct ethhdr *eh,
             rah->ar_op = htons(ARPOP_REQUEST);
 
             /* source hw addr */
-            memcpy(rah->ar_sha, special_ethaddr, ETH_ALEN - 4);
-            memcpy(&rah->ar_sha[2], &slirp->vhost_addr, 4);
+            memcpy(rah->ar_sha, reh->h_source, ETH_ALEN);
 
             /* source IP */
             rah->ar_sip = slirp->vhost_addr.s_addr;
@@ -1378,9 +1393,7 @@ static int if_encap4(Slirp *slirp, struct mbuf *ifm, struct ethhdr *eh,
         }
         return 0;
     } else {
-        memcpy(eh->h_source, special_ethaddr, ETH_ALEN - 4);
-        /* XXX: not correct */
-        memcpy(&eh->h_source[2], &slirp->vhost_addr, 4);
+        in4_compute_ethaddr(slirp, slirp->vhost_addr, eh->h_source);
         eh->h_proto = htons(ETH_P_IP);
 
         /* Send this */
@@ -1406,7 +1419,7 @@ static int if_encap6(Slirp *slirp, struct mbuf *ifm, struct ethhdr *eh,
         return 0;
     } else {
         eh->h_proto = htons(ETH_P_IPV6);
-        in6_compute_ethaddr(ip6h->ip_src, eh->h_source);
+        in6_compute_ethaddr(slirp, ip6h->ip_src, eh->h_source);
 
         /* Send this */
         return 2;

@@ -165,14 +165,10 @@ static inline bool in6_equal_mach(const struct in6_addr *a,
 /* Check that the IPv6 is zero */
 #define in6_zero(a) (in6_equal(a, &(struct in6_addr)ZERO_ADDR))
 
-/* Compute emulated host MAC address from its ipv6 address */
-static inline void in6_compute_ethaddr(struct in6_addr ip,
-                                       uint8_t eth[ETH_ALEN])
-{
-    eth[0] = 0x52;
-    eth[1] = 0x56;
-    memcpy(&eth[2], &ip.s6_addr[16 - (ETH_ALEN - 2)], ETH_ALEN - 2);
-}
+/* Compute an emulated host MAC, honoring the optional shared address. */
+struct Slirp;
+void in6_compute_ethaddr(struct Slirp *slirp, struct in6_addr ip,
+                        uint8_t eth[ETH_ALEN]);
 
 static inline bool in6_martian(const struct in6_addr *ip)
 {

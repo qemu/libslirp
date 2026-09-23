@@ -16,6 +16,18 @@ static const char icmp6_ping_msg[] =
     "This is a pseudo-PING packet used by Slirp to emulate ICMPV6 ECHO-REQUEST "
     "packets.\n";
 
+void in6_compute_ethaddr(Slirp *slirp, struct in6_addr ip,
+                        uint8_t eth[ETH_ALEN])
+{
+    if (slirp->has_shared_mac) {
+        memcpy(eth, slirp->shared_mac, ETH_ALEN);
+    } else {
+        eth[0] = 0x52;
+        eth[1] = 0x56;
+        memcpy(&eth[2], &ip.s6_addr[16 - (ETH_ALEN - 2)], ETH_ALEN - 2);
+    }
+}
+
 void icmp6_post_init(Slirp *slirp)
 {
     if (!slirp->in6_enabled) {
@@ -319,7 +331,7 @@ static void ndp_send_ra(Slirp *slirp)
     struct ndpopt *opt = mtod(t, struct ndpopt *);
     opt->ndpopt_type = NDPOPT_LINKLAYER_SOURCE;
     opt->ndpopt_len = NDPOPT_LINKLAYER_LEN / 8;
-    in6_compute_ethaddr(rip->ip_src, opt->ndpopt_linklayer);
+    in6_compute_ethaddr(slirp, rip->ip_src, opt->ndpopt_linklayer);
     t->m_data += NDPOPT_LINKLAYER_LEN;
     pl_size += NDPOPT_LINKLAYER_LEN;
 
@@ -408,7 +420,7 @@ void ndp_send_ns(Slirp *slirp, struct in6_addr addr)
     struct ndpopt *opt = mtod(t, struct ndpopt *);
     opt->ndpopt_type = NDPOPT_LINKLAYER_SOURCE;
     opt->ndpopt_len = NDPOPT_LINKLAYER_LEN / 8;
-    in6_compute_ethaddr(slirp->vhost_addr6, opt->ndpopt_linklayer);
+    in6_compute_ethaddr(slirp, slirp->vhost_addr6, opt->ndpopt_linklayer);
 
     /* ICMPv6 Checksum */
     t->m_data -= ICMP6_NDP_NA_MINLEN;
@@ -457,7 +469,7 @@ static void ndp_send_na(Slirp *slirp, struct ip6 *ip, struct icmp6 *icmp)
     struct ndpopt *opt = mtod(t, struct ndpopt *);
     opt->ndpopt_type = NDPOPT_LINKLAYER_TARGET;
     opt->ndpopt_len = NDPOPT_LINKLAYER_LEN / 8;
-    in6_compute_ethaddr(ricmp->icmp6_nna.target, opt->ndpopt_linklayer);
+    in6_compute_ethaddr(slirp, ricmp->icmp6_nna.target, opt->ndpopt_linklayer);
 
     /* ICMPv6 Checksum */
     t->m_data -= ICMP6_NDP_NA_MINLEN;

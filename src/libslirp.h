@@ -255,6 +255,13 @@ typedef struct SlirpConfig {
     /* Pending host-forwarded TCP connections passed to listen().
      * Zero selects the historical default of one; negative values are invalid. */
     int hostfwd_listen_backlog;
+    /* Optional shared source MAC for all emulated IPv4/IPv6 endpoints,
+     * including ARP and NDP link-layer addresses. All zeros preserves the
+     * existing IP-derived MAC addresses. Otherwise this must be a unicast
+     * address, unique on the attached Ethernet network. Copied by slirp_new().
+     * For example, VirtualBox NAT Network can use 52:54:00:12:35:00 for
+     * compatibility with its IntNet switch's single-MAC interface. */
+    uint8_t shared_mac[6];
 } SlirpConfig;
 
 /* Create a new instance of a slirp stack */

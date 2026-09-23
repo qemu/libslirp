@@ -164,6 +164,8 @@ struct Slirp {
 
     uint32_t mfr_id;
     uint8_t oob_eth_addr[ETH_ALEN];
+    uint8_t shared_mac[ETH_ALEN];
+    bool has_shared_mac;
     int hostfwd_listen_backlog;
 
     /* mbuf states */
