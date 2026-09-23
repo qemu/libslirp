@@ -86,11 +86,13 @@ struct mbuf *m_get(Slirp *slirp)
 {
     register struct mbuf *m;
     int flags = 0;
+    /* A shared pool must accommodate either protocol, including reused mbufs. */
+    int mtu = MAX(slirp->if_mtu, slirp->if_mtu6);
 
     DEBUG_CALL("m_get");
 
     if (MBUF_DEBUG || slirp->m_freelist.qh_link == &slirp->m_freelist) {
-        m = g_malloc(SLIRP_MSIZE(slirp->if_mtu));
+        m = g_malloc(SLIRP_MSIZE(mtu));
         slirp->mbuf_alloced++;
         if (MBUF_DEBUG || slirp->mbuf_alloced > MBUF_THRESH)
             flags = M_DOFREE;
@@ -105,7 +107,7 @@ struct mbuf *m_get(Slirp *slirp)
     m->m_flags = (flags | M_USEDLIST);
 
     /* Initialise it */
-    m->m_size = SLIRP_MSIZE(slirp->if_mtu) - offsetof(struct mbuf, m_dat);
+    m->m_size = SLIRP_MSIZE(mtu) - offsetof(struct mbuf, m_dat);
     m->m_data = m->m_dat;
     m->m_len = 0;
     m->m_nextpkt = NULL;

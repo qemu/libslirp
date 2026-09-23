@@ -158,7 +158,7 @@ static void dhcpv6_info_request(Slirp *slirp, struct sockaddr_in6 *srcsas,
 
     if (ri.client_id) {
         if (resp + 4 + ri.client_id_len >
-            (uint8_t *)m->m_data + slirp->if_mtu) {
+            (uint8_t *)m->m_data + slirp->if_mtu6) {
             m_free(m); /* response would overflow the interface-MTU-sized mbuf */
             return;
         }
@@ -170,7 +170,7 @@ static void dhcpv6_info_request(Slirp *slirp, struct sockaddr_in6 *srcsas,
         resp += ri.client_id_len;
     }
     if (ri.want_dns) {
-        if (resp + 4 + 16 > (uint8_t *)m->m_data + slirp->if_mtu) {
+        if (resp + 4 + 16 > (uint8_t *)m->m_data + slirp->if_mtu6) {
             m_free(m); /* reply would not fit the interface-MTU-sized mbuf */
             return;
         }
@@ -185,7 +185,7 @@ static void dhcpv6_info_request(Slirp *slirp, struct sockaddr_in6 *srcsas,
         uint8_t *sa = slirp->vhost_addr6.s6_addr;
         int slen, smaxlen;
 
-        smaxlen = (uint8_t *)m->m_data + slirp->if_mtu - (resp + 4);
+        smaxlen = (uint8_t *)m->m_data + slirp->if_mtu6 - (resp + 4);
         if (smaxlen < 0) {
             m_free(m); /* boot-url would not fit the interface-MTU-sized mbuf */
             return;

@@ -168,12 +168,12 @@ static struct tftp_t *tftp_prep_mbuf_data(struct tftp_session *spt,
 
 static size_t tftp_room(struct tftp_session *spt)
 {
-    size_t room = spt->slirp->if_mtu;
+    size_t room;
 
     if (spt->client_addr.ss_family == AF_INET6) {
-        room -= sizeof(struct ip6);
+        room = spt->slirp->if_mtu6 - sizeof(struct ip6);
     } else {
-        room -= sizeof(struct ip);
+        room = spt->slirp->if_mtu - sizeof(struct ip);
     }
     room -= sizeof(struct udphdr);
 

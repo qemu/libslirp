@@ -161,6 +161,8 @@ struct Slirp {
 
     int if_mtu;
     int if_mru;
+    int if_mtu6;
+    int if_mru6;
 
     bool disable_host_loopback;
 

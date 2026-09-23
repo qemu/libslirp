@@ -251,7 +251,9 @@ struct tcpcb *tcp_newtcpcb(struct socket *so)
      * 60: length of IPv6 header (40) + TCP header (20)
      */
     tp->t_maxseg =
-        MIN(so->slirp->if_mtu - ((so->so_ffamily == AF_INET) ? 40 : 60),
+        MIN(((so->so_ffamily == AF_INET) ?
+                 so->slirp->if_mtu - 40 :
+                 so->slirp->if_mtu6 - 60),
             TCP_MAXSEG_MAX);
 
     tp->t_flags = TCP_DO_RFC1323 ? (TF_REQ_SCALE | TF_REQ_TSTMP) : 0;

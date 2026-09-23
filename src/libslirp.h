@@ -282,6 +282,10 @@ typedef struct SlirpConfig {
      * ownership. NULL/empty disables mapping. disable_host_loopback also
      * disables translation and ARP replies for mapped addresses. */
     const struct ip4_lomap_desc *loopback_map;
+    /* IPv6 MTU/MRU. Zero inherits the effective if_mtu/if_mru value.
+     * Explicit nonzero values must be at least 1280. */
+    size_t if_mtu6;
+    size_t if_mru6;
 } SlirpConfig;
 
 /* Create a new instance of a slirp stack */

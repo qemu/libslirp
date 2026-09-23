@@ -666,8 +666,12 @@ Slirp *slirp_new(const SlirpConfig *cfg, const SlirpCb *callbacks, void *opaque)
                 }
             }
         }
-    }
 
+        g_return_val_if_fail(cfg->if_mtu6 == 0 || cfg->if_mtu6 >= 1280, NULL);
+        g_return_val_if_fail(cfg->if_mtu6 <= IF_MTU_MAX, NULL);
+        g_return_val_if_fail(cfg->if_mru6 == 0 || cfg->if_mru6 >= 1280, NULL);
+        g_return_val_if_fail(cfg->if_mru6 <= IF_MRU_MAX, NULL);
+    }
     slirp = g_malloc0(sizeof(Slirp));
 
     slirp_init_once();
@@ -709,6 +713,16 @@ Slirp *slirp_new(const SlirpConfig *cfg, const SlirpCb *callbacks, void *opaque)
     }
     slirp->if_mtu = cfg->if_mtu == 0 ? IF_MTU_DEFAULT : cfg->if_mtu;
     slirp->if_mru = cfg->if_mru == 0 ? IF_MRU_DEFAULT : cfg->if_mru;
+    slirp->if_mtu6 = slirp->if_mtu;
+    slirp->if_mru6 = slirp->if_mru;
+    if (cfg->version >= 7) {
+        if (cfg->if_mtu6) {
+            slirp->if_mtu6 = cfg->if_mtu6;
+        }
+        if (cfg->if_mru6) {
+            slirp->if_mru6 = cfg->if_mru6;
+        }
+    }
     slirp->disable_host_loopback = cfg->disable_host_loopback;
     slirp->enable_emu = cfg->enable_emu;
 

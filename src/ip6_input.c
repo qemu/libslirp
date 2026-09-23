@@ -50,7 +50,7 @@ void ip6_input(struct mbuf *m)
 
     ip6_len = ntohs(ip6->ip_pl) + sizeof(struct ip6);
 
-    if (ip6_len > slirp->if_mtu) {
+    if (ip6_len > slirp->if_mtu6) {
         icmp6_send_error(m, ICMP6_TOOBIG, 0);
         goto bad;
     }

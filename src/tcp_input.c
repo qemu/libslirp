@@ -1535,7 +1535,7 @@ int tcp_mss(struct tcpcb *tp, unsigned offer)
               sizeof(struct tcphdr) - sizeof(struct ip);
         break;
     case AF_INET6:
-        mss = MIN(so->slirp->if_mtu, so->slirp->if_mru) -
+        mss = MIN(so->slirp->if_mtu6, so->slirp->if_mru6) -
               sizeof(struct tcphdr) - sizeof(struct ip6);
         break;
     default:

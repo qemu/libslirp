@@ -322,3 +322,12 @@ loopbacktest = executable('loopbacktest', 'test/loopbacktest.c',
   dependencies: libslirp_deps,
 )
 test('loopback', loopbacktest)
+
+mtu6test = executable('mtu6test', 'test/mtu6test.c',
+  objects: lib.extract_all_objects(recursive: false),
+  c_args: cargs,
+  link_args: vflag,
+  include_directories: ['src'],
+  dependencies: libslirp_deps,
+)
+test('mtu6', mtu6test)
