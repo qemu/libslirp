@@ -779,6 +779,7 @@ void slirp_cleanup(Slirp *slirp)
     g_free(slirp->tftp_prefix);
     g_free(slirp->bootp_filename);
     g_free(slirp->vdomainname);
+    g_free(slirp->tftp_server_name);
     g_free(slirp);
 }
 
