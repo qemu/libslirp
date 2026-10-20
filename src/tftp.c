@@ -295,6 +295,7 @@ static void tftp_handle_rrq(Slirp *slirp, struct sockaddr_storage *srcsas,
     struct tftp_session *spt;
     int s, k;
     size_t prefix_len;
+    size_t fname_len;
     char *req_fname;
     const char *option_name[2];
     uint32_t option_value[2];
@@ -360,13 +361,14 @@ static void tftp_handle_rrq(Slirp *slirp, struct sockaddr_storage *srcsas,
     k += 6; /* skipping octet */
 
     /* do sanity checks on the filename */
-    if (
+    fname_len = strlen(req_fname);
+    if (fname_len == 0 ||
 #ifdef G_OS_WIN32
         strstr(req_fname, "..\\") ||
-        req_fname[strlen(req_fname) - 1] == '\\' ||
+        req_fname[fname_len - 1] == '\\' ||
 #endif
         strstr(req_fname, "../") ||
-        req_fname[strlen(req_fname) - 1] == '/') {
+        req_fname[fname_len - 1] == '/') {
         tftp_send_error(spt, 2, "Access violation", tp);
         return;
     }
