@@ -228,6 +228,8 @@ int fork_exec(struct socket *so, const char *ex)
     if (!g_shell_parse_argv(ex, &argc, &argv, &err)) {
         g_critical("fork_exec invalid command: %s\nerror: %s", ex, err->message);
         g_error_free(err);
+        closesocket(sp[0]);
+        closesocket(sp[1]);
         return 0;
     }
 
