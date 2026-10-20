@@ -266,7 +266,7 @@ void icmp6_receive(struct socket *so)
             error_code = ICMP6_UNREACH_ADDRESS;
         }
         DEBUG_MISC(" udp icmp rx errno = %d-%s", errno, g_strerror(errno));
-        icmp6_send_error(so->so_m, ICMP_UNREACH, error_code);
+        icmp6_send_error(so->so_m, ICMP6_UNREACH, error_code);
     } else {
         icmp6_reflect(so->so_m);
         so->so_m = NULL; /* Don't m_free() it again! */
