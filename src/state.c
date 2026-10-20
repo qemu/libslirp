@@ -351,11 +351,17 @@ int slirp_state_load(Slirp *slirp, int version_id, SlirpReadCb read_cb,
         ret =
             slirp_vmstate_load_state(&f, &vmstate_slirp_socket, so, version_id);
         if (ret < 0) {
+            sbfree(&so->so_rcv);
+            sbfree(&so->so_snd);
+            sofree(so);
             return ret;
         }
 
         if ((so->so_faddr.s_addr & slirp->vnetwork_mask.s_addr) !=
             slirp->vnetwork_addr.s_addr) {
+            sbfree(&so->so_rcv);
+            sbfree(&so->so_snd);
+            sofree(so);
             return -EINVAL;
         }
         for (ex_ptr = slirp->guestfwd_list; ex_ptr; ex_ptr = ex_ptr->ex_next) {
@@ -366,6 +372,9 @@ int slirp_state_load(Slirp *slirp, int version_id, SlirpReadCb read_cb,
             }
         }
         if (!ex_ptr) {
+            sbfree(&so->so_rcv);
+            sbfree(&so->so_snd);
+            sofree(so);
             return -EINVAL;
         }
 
