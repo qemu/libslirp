@@ -538,9 +538,12 @@ void icmp_receive(struct socket *so)
             error_code = ICMP_UNREACH_HOST;
         }
         DEBUG_MISC(" udp icmp rx errno = %d-%s", errno, g_strerror(errno));
-        icmp_send_error(so->so_m, ICMP_UNREACH, error_code, 0, g_strerror(errno));
+        icmp_send_error(m, ICMP_UNREACH, error_code, 0, g_strerror(errno));
     } else {
-        icmp_reflect(so->so_m);
+        m->m_len = hlen + len;
+        ip->ip_len = m->m_len;
+
+        icmp_reflect(m);
         so->so_m = NULL; /* Don't m_free() it again! */
     }
     icmp_detach(so);
