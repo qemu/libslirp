@@ -445,7 +445,7 @@ static void tftp_handle_rrq(Slirp *slirp, struct sockaddr_storage *srcsas,
 
             /* Accept blksize up to our maximum size */
             if (blksize > 0) {
-                spt->block_size = MIN(blksize, TFTP_BLOCKSIZE_MAX);
+                spt->block_size = blksize;
                 option_name[nb_options] = "blksize";
                 option_value[nb_options] = spt->block_size;
                 nb_options++;
