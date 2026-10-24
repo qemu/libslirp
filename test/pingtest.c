@@ -380,7 +380,7 @@ static struct SlirpCb callbacks = {
 
 int main(int argc, char *argv[]) {
     SlirpConfig config = {
-        .version = 4,
+        .version = SLIRP_CONFIG_VERSION_MAX,
         .restricted = false,
         .in_enabled = true,
         .vnetwork.s_addr = htonl(0x0a000200),
