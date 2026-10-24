@@ -166,6 +166,20 @@ static struct tftp_t *tftp_prep_mbuf_data(struct tftp_session *spt,
     return tp;
 }
 
+static size_t tftp_room(struct tftp_session *spt)
+{
+    size_t room = spt->slirp->if_mtu;
+
+    if (spt->client_addr.ss_family == AF_INET6) {
+        room -= sizeof(struct ip6);
+    } else {
+        room -= sizeof(struct ip);
+    }
+    room -= sizeof(struct udphdr);
+
+    return room;
+}
+
 static void tftp_udp_output(struct tftp_session *spt, struct mbuf *m,
                             struct tftphdr *hdr)
 {
@@ -196,6 +210,7 @@ static int tftp_send_oack(struct tftp_session *spt, const char *keys[],
     struct mbuf *m;
     struct tftp_t *tp;
     int i, n = 0;
+    size_t room;
 
     m = m_get(spt->slirp);
 
@@ -203,14 +218,16 @@ static int tftp_send_oack(struct tftp_session *spt, const char *keys[],
         return -1;
 
     tp = tftp_prep_mbuf_data(spt, m);
+    room = tftp_room(spt);
+    room -= sizeof(tp->hdr.tp_op);
 
     tp->hdr.tp_op = htons(TFTP_OACK);
     for (i = 0; i < nb; i++) {
-        n += slirp_fmt0(tp->x.tp_buf + n, sizeof(tp->x.tp_buf) - n, "%s", keys[i]);
-        n += slirp_fmt0(tp->x.tp_buf + n, sizeof(tp->x.tp_buf) - n, "%u", values[i]);
+        n += slirp_fmt0(tp->x.tp_buf + n, room - n, "%s", keys[i]);
+        n += slirp_fmt0(tp->x.tp_buf + n, room - n, "%u", values[i]);
     }
 
-    m->m_len = G_SIZEOF_MEMBER(struct tftp_t, hdr.tp_op) + n;
+    m->m_len = sizeof(tp->hdr.tp_op) + n;
     tftp_udp_output(spt, m, &recv_tp->hdr);
 
     return 0;
@@ -221,6 +238,7 @@ static void tftp_send_error(struct tftp_session *spt, uint16_t errorcode,
 {
     struct mbuf *m;
     struct tftp_t *tp;
+    size_t room;
 
     DEBUG_TFTP("tftp error msg: %s", msg);
 
@@ -231,14 +249,17 @@ static void tftp_send_error(struct tftp_session *spt, uint16_t errorcode,
     }
 
     tp = tftp_prep_mbuf_data(spt, m);
+    room = tftp_room(spt);
+    room -= sizeof(tp->hdr.tp_op);
+    room -= sizeof(tp->x.tp_error.tp_error_code);
 
     tp->hdr.tp_op = htons(TFTP_ERROR);
     tp->x.tp_error.tp_error_code = htons(errorcode);
-    slirp_pstrcpy((char *)tp->x.tp_error.tp_msg, sizeof(tp->x.tp_error.tp_msg),
-                  msg);
+    slirp_pstrcpy((char *)tp->x.tp_error.tp_msg, room, msg);
 
-    m->m_len = sizeof(struct tftp_t) - (TFTP_BLOCKSIZE_MAX + 2) + 3 +
-               strlen(msg) - sizeof(struct udphdr);
+    m->m_len = sizeof(tp->hdr.tp_op)
+               + sizeof(tp->x.tp_error.tp_error_code)
+               + strlen((char*)tp->x.tp_error.tp_msg) + 1;
     tftp_udp_output(spt, m, &recv_tp->hdr);
 
 out:
@@ -251,6 +272,7 @@ static void tftp_send_next_block(struct tftp_session *spt,
     struct mbuf *m;
     struct tftp_t *tp;
     int nobytes;
+    size_t room;
 
     m = m_get(spt->slirp);
 
@@ -259,12 +281,15 @@ static void tftp_send_next_block(struct tftp_session *spt,
     }
 
     tp = tftp_prep_mbuf_data(spt, m);
+    room = tftp_room(spt);
+    room -= sizeof(tp->hdr.tp_op);
+    room -= sizeof(tp->x.tp_data.tp_block_nr);
 
     tp->hdr.tp_op = htons(TFTP_DATA);
     tp->x.tp_data.tp_block_nr = htons((spt->block_nr + 1) & 0xffff);
 
     nobytes = tftp_read_data(spt, spt->block_nr, tp->x.tp_data.tp_buf,
-                             spt->block_size);
+                             MIN(room, spt->block_size));
 
     if (nobytes < 0) {
         /* send "file not found" error back */
@@ -276,8 +301,9 @@ static void tftp_send_next_block(struct tftp_session *spt,
         return;
     }
 
-    m->m_len = sizeof(struct tftp_t) - (TFTP_BLOCKSIZE_MAX - nobytes) -
-               sizeof(struct udphdr);
+    m->m_len = sizeof(tp->hdr.tp_op)
+               + sizeof(tp->x.tp_data.tp_block_nr)
+               + nobytes;
     tftp_udp_output(spt, m, hdr);
 
     if (nobytes == spt->block_size) {
