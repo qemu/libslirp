@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.9.6] - 2026-10-25
+
+## Security
+
+  - Fix Buffer Underflow in `tftp_handle_rrq()` When Handling Empty Filename #100
+  - Fix Echo Reply Length Desynchronization in `icmp_receive()` and `icmp6_receive()` #105
+  - Reject martians
+  - tftp: check actual available room
+
+## Fixed
+
+  - Fix memory leak of tftp_server_name #99
+  - Fix Protocol Type Mismatch in `icmp6_receive()`: IPv4 `ICMP_UNREACH` Emitted as ICMPv6 #101
+  - Fix Double Socket Descriptor Leak in `fork_exec()` on Argument Parsing Failure #102
+  - Fix Socket Heap Memory & Buffer Leak in `slirp_state_load()` on Deserialization or Validation Failure #103
+  - Avoid Non-Reentrant Static Variable in `tcp_emu()` #104
+  - pingtest: use SLIRP_CONFIG_VERSION_MAX
+  - icmp: preserve guest TTL and forward traceroute ICMP errors !166
+  - dns: proxy DNS queries sent to the virtual gateway address !163
+  - tftp: Drop TFTP_BLOCKSIZE_MAX
+
 ## [4.9.5] - 2026-09-22
 
 ## Security
@@ -315,7 +336,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Standalone project, removing any QEMU dependency.
  - License clarifications.
 
-[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.5...master
+[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.6...master
+[4.9.5]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.5...v4.9.6
 [4.9.5]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.4...v4.9.5
 [4.9.4]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.3...v4.9.4
 [4.9.3]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.2...v4.9.3
