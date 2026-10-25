@@ -160,6 +160,18 @@ typedef struct SlirpCb {
 #define SLIRP_CONFIG_VERSION_MIN 1
 #define SLIRP_CONFIG_VERSION_MAX 7
 
+/* Redirect a guest-visible IPv4 endpoint to a host loopback address.
+ * Both addresses are complete IPv4 addresses in network byte order. */
+struct ip4_lomap {
+    struct in_addr loaddr;
+    struct in_addr vaddr;
+};
+
+struct ip4_lomap_desc {
+    const struct ip4_lomap *lomap;
+    unsigned int lomap_len;
+};
+
 typedef struct SlirpConfig {
     /* Version must be provided */
     uint32_t version;
@@ -262,6 +274,14 @@ typedef struct SlirpConfig {
      * For example, VirtualBox NAT Network can use 52:54:00:12:35:00 for
      * compatibility with its IntNet switch's single-MAC interface. */
     uint8_t shared_mac[6];
+    /* Optional map from addresses in vnetwork/vnetmask to host 127.0.0.0/8
+     * endpoints. For example, 10.0.2.100 -> 127.0.0.2 exposes services on
+     * that host alias to the guest, preserving the destination port.
+     * Entries must use distinct unicast guest addresses, excluding vhost
+     * and vnameserver. slirp_new() copies the array; the caller retains
+     * ownership. NULL/empty disables mapping. disable_host_loopback also
+     * disables translation and ARP replies for mapped addresses. */
+    const struct ip4_lomap_desc *loopback_map;
 } SlirpConfig;
 
 /* Create a new instance of a slirp stack */

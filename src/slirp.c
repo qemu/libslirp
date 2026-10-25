@@ -644,6 +644,28 @@ Slirp *slirp_new(const SlirpConfig *cfg, const SlirpCb *callbacks, void *opaque)
     if (cfg->version >= 7) {
         g_return_val_if_fail(cfg->hostfwd_listen_backlog >= 0, NULL);
         g_return_val_if_fail(!(cfg->shared_mac[0] & 1), NULL);
+
+        if (cfg->loopback_map) {
+            const struct ip4_lomap_desc *map = cfg->loopback_map;
+            uint32_t mask = ntohl(cfg->vnetmask.s_addr);
+            uint32_t network = ntohl(cfg->vnetwork.s_addr) & mask;
+
+            g_return_val_if_fail(!map->lomap_len || map->lomap, NULL);
+            for (unsigned int i = 0; i < map->lomap_len; i++) {
+                uint32_t addr = ntohl(map->lomap[i].vaddr.s_addr);
+                uint32_t loaddr = ntohl(map->lomap[i].loaddr.s_addr);
+
+                g_return_val_if_fail((loaddr & 0xff000000) == 0x7f000000, NULL);
+                g_return_val_if_fail((addr & mask) == network, NULL);
+                g_return_val_if_fail(addr != network && addr != (network | ~mask), NULL);
+                g_return_val_if_fail(map->lomap[i].vaddr.s_addr != cfg->vhost.s_addr, NULL);
+                g_return_val_if_fail(map->lomap[i].vaddr.s_addr != cfg->vnameserver.s_addr, NULL);
+                for (unsigned int j = 0; j < i; j++) {
+                    g_return_val_if_fail(map->lomap[i].vaddr.s_addr !=
+                                        map->lomap[j].vaddr.s_addr, NULL);
+                }
+            }
+        }
     }
 
     slirp = g_malloc0(sizeof(Slirp));
@@ -732,6 +754,17 @@ Slirp *slirp_new(const SlirpConfig *cfg, const SlirpCb *callbacks, void *opaque)
         static const uint8_t zero_mac[ETH_ALEN];
         memcpy(slirp->shared_mac, cfg->shared_mac, ETH_ALEN);
         slirp->has_shared_mac = memcmp(cfg->shared_mac, zero_mac, ETH_ALEN) != 0;
+
+        if (cfg->loopback_map && !cfg->disable_host_loopback) {
+            unsigned int len = cfg->loopback_map->lomap_len;
+
+            if (len) {
+                slirp->loopback_map = g_malloc_n(len, sizeof(*slirp->loopback_map));
+                memcpy(slirp->loopback_map, cfg->loopback_map->lomap,
+                       len * sizeof(*slirp->loopback_map));
+                slirp->loopback_map_len = len;
+            }
+        }
     }
 
     ip6_post_init(slirp);
@@ -789,6 +822,7 @@ void slirp_cleanup(Slirp *slirp)
     m_cleanup(slirp);
     tftp_cleanup(slirp);
 
+    g_free(slirp->loopback_map);
     g_rand_free(slirp->grand);
 
     g_free(slirp->vdnssearch);
@@ -1265,6 +1299,11 @@ static void arp_input(Slirp *slirp, const uint8_t *pkt, int pkt_len)
                 ah->ar_tip == slirp->vhost_addr.s_addr)
                 goto arp_ok;
             /* TODO: IPv6 */
+            for (unsigned int i = 0; i < slirp->loopback_map_len; i++) {
+                if (ah->ar_tip == slirp->loopback_map[i].vaddr.s_addr) {
+                    goto arp_ok;
+                }
+            }
             for (ex_ptr = slirp->guestfwd_list; ex_ptr;
                  ex_ptr = ex_ptr->ex_next) {
                 if (ex_ptr->ex_addr.s_addr == ah->ar_tip)

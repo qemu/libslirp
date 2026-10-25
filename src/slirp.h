@@ -150,6 +150,8 @@ struct Slirp {
     struct in_addr vdhcp_startaddr;
     struct in_addr vnameserver_addr;
     struct in6_addr vnameserver_addr6;
+    struct ip4_lomap *loopback_map;
+    unsigned int loopback_map_len;
 
     struct in_addr client_ipaddr;
     char client_hostname[33];

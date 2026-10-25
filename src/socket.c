@@ -987,6 +987,15 @@ static bool sotranslate_out4(Slirp *s, struct socket *so, struct sockaddr_in *si
         return get_dns_addr(&sin->sin_addr, &sin->sin_port) >= 0;
     }
 
+    if (!s->disable_host_loopback) {
+        for (unsigned int i = 0; i < s->loopback_map_len; i++) {
+            if (so->so_faddr.s_addr == s->loopback_map[i].vaddr.s_addr) {
+                sin->sin_addr = s->loopback_map[i].loaddr;
+                return true;
+            }
+        }
+    }
+
     if (s->forward_broadcast &&
         (so->so_faddr.s_addr == 0xffffffff ||
          so->so_faddr.s_addr ==

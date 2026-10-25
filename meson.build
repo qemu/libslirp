@@ -313,3 +313,12 @@ sharedmactest = executable('sharedmactest', 'test/sharedmactest.c',
   dependencies: libslirp_deps,
 )
 test('sharedmac', sharedmactest)
+
+loopbacktest = executable('loopbacktest', 'test/loopbacktest.c',
+  objects: lib.extract_all_objects(recursive: false),
+  c_args: cargs,
+  link_args: vflag,
+  include_directories: ['src'],
+  dependencies: libslirp_deps,
+)
+test('loopback', loopbacktest)
