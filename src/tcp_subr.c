@@ -840,6 +840,7 @@ int tcp_emu(struct socket *so, struct mbuf *m)
         return 1;
 
     case EMU_REALAUDIO:
+    {
         /*
          * RealAudio emulation - JP. We must try to parse the incoming
          * data and try to find the two characters that contain the
@@ -970,6 +971,7 @@ int tcp_emu(struct socket *so, struct mbuf *m)
             ra++;
         }
         return 1;
+    }
 
     default:
         /* Ooops, not emulated, won't call tcp_emu again */
