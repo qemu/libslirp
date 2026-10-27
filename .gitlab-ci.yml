@@ -36,6 +36,13 @@ build-usan:
     - ninja -C build
     - (cd build && meson test) || (cat build/meson-logs/testlog.txt && exit 1)
 
+build-valgrind:
+  script:
+    - dnf install -y valgrind
+    - meson --werror build || (cat build/meson-logs/meson-log.txt && exit 1)
+    - ninja -C build
+    - (cd build && meson test --wrapper='valgrind --track-origins=yes --leak-check=full --errors-for-leak-kinds=definite,indirect,possible --show-leak-kinds=all --error-exitcode=1') || (cat build/meson-logs/testlog.txt && exit 1)
+
 fuzz:
   parallel:
     matrix:
