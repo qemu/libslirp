@@ -6,13 +6,13 @@ fuzzing_engine = []
 
 extra_cargs += '-g'
 if fuzzer_build
-  extra_cargs += '-fsanitize=fuzzer,address'
+  extra_cargs += '-fsanitize=fuzzer,address,undefined'
   extra_cargs += '-fsanitize-coverage=edge,indirect-calls,trace-cmp'
   extra_cargs += '-DCUSTOM_MUTATOR'
   extra_cargs += '-fprofile-instr-generate'
   extra_cargs += '-fcoverage-mapping'
 
-  extra_ldargs += '-fsanitize=fuzzer,address'
+  extra_ldargs += '-fsanitize=fuzzer,address,undefined'
   extra_ldargs += '-fprofile-instr-generate'
   extra_ldargs += '-fcoverage-mapping'
 endif

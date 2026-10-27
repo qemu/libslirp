@@ -175,12 +175,12 @@ endif
 
 if fuzzer_build
   cargs += '-fsanitize-coverage=edge,indirect-calls,trace-cmp'
-  cargs += '-fsanitize=fuzzer-no-link,address'
+  cargs += '-fsanitize=fuzzer-no-link,address,undefined'
   cargs += '-fprofile-instr-generate'
   cargs += '-fcoverage-mapping'
   cargs += '-g'
   cargs += '-DSLIRP_DEBUG'
-  vflag += '-fsanitize=fuzzer-no-link,address'
+  vflag += '-fsanitize=fuzzer-no-link,address,undefined'
   vflag += '-fsanitize-coverage=edge,indirect-calls,trace-cmp'
   vflag += '-fprofile-instr-generate'
   vflag += '-fcoverage-mapping'
