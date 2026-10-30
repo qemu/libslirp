@@ -5,16 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.9.7] - 2026-10-30
+
+### Security
+
+  - ip6_icmp: Fix memory leak on ipv6 ping
+  - icmp_forward_error: Fix Out-of-Bounds Heap Read & Information Disclosure
+  - if_output: Fix Queue Pointer Corruption and Crash
+  - ARP/NDP: avoid adding records for multicast addresses and our addresses
+
+### Fixed
+
+  - Fix build with llvm
+  - bootp: Fix endianness of addition
+
 ## [4.9.6] - 2026-10-25
 
-## Security
+### Security
 
   - Fix Buffer Underflow in `tftp_handle_rrq()` When Handling Empty Filename #100
   - Fix Echo Reply Length Desynchronization in `icmp_receive()` and `icmp6_receive()` #105
   - Reject martians
   - tftp: check actual available room
 
-## Fixed
+### Fixed
 
   - Fix memory leak of tftp_server_name #99
   - Fix Protocol Type Mismatch in `icmp6_receive()`: IPv4 `ICMP_UNREACH` Emitted as ICMPv6 #101
@@ -28,7 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.9.5] - 2026-09-22
 
-## Security
+### Security
 
   - Fix bounds-check in processing OEM commands (CVE-2026-95507)
   - Fix bounds-check in dhcpv6 against MTU (CVE-2026-95508)
@@ -39,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.9.4] - 2026-08-25
 
-## Security
+### Security
 
   - Fix information leak on fragmented packets with different header lengths
 
@@ -60,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.9.2] - 2026-05-23
 
-## Security
+### Security
 
   - oob: cap urgent data count to what is actually available #93 (CVE-2026-9539)
 
@@ -336,8 +350,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Standalone project, removing any QEMU dependency.
  - License clarifications.
 
-[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.6...master
-[4.9.5]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.5...v4.9.6
+[Unreleased]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.7...master
+[4.9.7]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.6...v4.9.7
+[4.9.6]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.5...v4.9.6
 [4.9.5]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.4...v4.9.5
 [4.9.4]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.3...v4.9.4
 [4.9.3]: https://gitlab.freedesktop.org/slirp/libslirp/compare/v4.9.2...v4.9.3
