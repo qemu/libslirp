@@ -106,6 +106,8 @@ void sofree(struct socket *so)
     if (so->so_tcpcb) {
         g_free(so->so_tcpcb);
     }
+    sbfree(&so->so_rcv);
+    sbfree(&so->so_snd);
     g_free(so);
 }
 
