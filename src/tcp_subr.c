@@ -526,6 +526,20 @@ void tcp_connect(struct socket *inso)
         tcp_close(sototcpcb(so)); /* This will sofree() as well */
         return;
     }
+
+    /* Close the accept() socket, set right state */
+    if (inso->so_state & SS_FACCEPTONCE) {
+        /* If we only accept once, close the accept() socket */
+        slirp_unregister_poll_socket(so);
+        closesocket(so->s);
+
+        /* Don't select it yet, even though we have an FD */
+        /* if it's not FACCEPTONCE, it's already NOFDREF */
+        so->so_state = SS_NOFDREF;
+
+        /* We can now replace the socket in so */
+    }
+
     so->s = s;
     slirp_set_nonblock(s);
     slirp_register_poll_socket(so);
@@ -537,16 +551,6 @@ void tcp_connect(struct socket *inso)
     so->fhost.ss = addr;
     sotranslate_accept(so);
 
-    /* Close the accept() socket, set right state */
-    if (inso->so_state & SS_FACCEPTONCE) {
-        /* If we only accept once, close the accept() socket */
-        slirp_unregister_poll_socket(so);
-        closesocket(so->s);
-
-        /* Don't select it yet, even though we have an FD */
-        /* if it's not FACCEPTONCE, it's already NOFDREF */
-        so->so_state = SS_NOFDREF;
-    }
     so->so_state |= SS_INCOMING;
 
     so->so_iptos = tcp_tos(so);
